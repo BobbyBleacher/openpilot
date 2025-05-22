@@ -126,8 +126,8 @@ void TermsPage::showEvent(QShowEvent *event) {
   buttons->addWidget(decline_btn);
   QObject::connect(decline_btn, &QPushButton::clicked, this, &TermsPage::declinedTerms);
 
-  accept_btn = new QPushButton(tr("Scroll to accept"));
-  accept_btn->setEnabled(false);
+  accept_btn = new QPushButton(tr("Accept"));
+  accept_btn->setEnabled(true);
   accept_btn->setStyleSheet(R"(
     QPushButton {
       background-color: #465BEA;
