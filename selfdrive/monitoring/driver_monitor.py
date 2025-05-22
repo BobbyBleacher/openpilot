@@ -158,7 +158,7 @@ class DriverStatus():
     self.threshold_prompt = self.settings._DISTRACTED_PROMPT_TIME_TILL_TERMINAL / self.settings._DISTRACTED_TIME
 
     self._set_timers(active_monitoring=True)
-    self.dev_unit = load_bool_param("TinklaDevUnit",False)
+    self.dev_unit = load_bool_param("TinklaDevUnit",True)
 
   def _reset_awareness(self):
     self.awareness = 1.
