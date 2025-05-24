@@ -1,3 +1,9 @@
+Version 0.9.6-beta64 (2025-05-24)
+========================
+* Remove nuisance messages
+* Potentially fixed acc_update bug
+* Auto disables driver monitoring and all sounds
+
 Version 0.9.6 (2023-12-14)
 ========================
 * AGNOS 9
