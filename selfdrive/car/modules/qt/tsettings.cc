@@ -128,7 +128,7 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
   };
   Params params;
 
-  params.putBool("TinklaDevUnit", false);
+  //params.putBool("TinklaDevUnit", false);
 
   for (auto &[param, title, desc, icon, edit_title,edit_desc, edit_uom, val_default,val_min,val_max,val_step, field_type] : tinkla_toggles) {
     if (field_type == TINKLA_TOGGLE) {
@@ -394,9 +394,9 @@ TeslaTogglesPanel::TeslaTogglesPanel(SettingsWindow *parent) : ListWidget(parent
   Params params;
 
   // Force these params ON before any UI is constructed
-  params.putBool("TinklaAdjustAccWithSpeedLimit", false);
-  params.putBool("TinklaDisableStartStopSounds", false);
-  params.putBool("TinklaDisablePromptSounds", false);
+  // params.putBool("TinklaAdjustAccWithSpeedLimit", false);
+  // params.putBool("TinklaDisableStartStopSounds", false);
+  // params.putBool("TinklaDisablePromptSounds", false);
 
   for (auto &[param, title, desc, icon, edit_title,edit_desc, edit_uom, val_default,val_min,val_max,val_step, field_type] : tinkla_toggles) {
     if (field_type == TINKLA_TOGGLE) {
