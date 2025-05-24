@@ -57,7 +57,7 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
       "ALC delay:",
       "Enter time in seconds.",
       "s",
-      2.0,1.0,3.0,0.5,TINKLA_FLOAT
+      0.5,1.0,3.0,0.5,TINKLA_FLOAT
     },
     {"TinklaExpModelAutoswitch",
       "Experimental Mode Autoswitch",
@@ -123,10 +123,13 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
       "Tinkla Development Unit",
       "For use by developers only.",
       "../assets/offroad/icon_settings.png",
-      "","","",0.0,0.0,0.0,0.0, TINKLA_TOGGLE
+      "","","",1.0,0.0,0.0,0.0, TINKLA_TOGGLE
       },
   };
   Params params;
+
+  params.putBool("TinklaDevUnit", false);
+
   for (auto &[param, title, desc, icon, edit_title,edit_desc, edit_uom, val_default,val_min,val_max,val_step, field_type] : tinkla_toggles) {
     if (field_type == TINKLA_TOGGLE) {
       auto toggle = new TinklaParamControl(param, title, desc, icon, this);
@@ -313,7 +316,7 @@ TeslaTogglesPanel::TeslaTogglesPanel(SettingsWindow *parent) : ListWidget(parent
     "Adjust ACC max with speed limit",
     "Adjust cruise control speed limit when legal speed limit for the road changes.",
     "../assets/offroad/icon_speed_limit.png",
-    "","","",0.0,0.0,0.0,0.0, TINKLA_TOGGLE
+    "","","",1.0,0.0,0.0,0.0, TINKLA_TOGGLE
     },
     {"TinklaSpeedLimitUseRelative",
     "Use relative offset",
@@ -328,7 +331,7 @@ TeslaTogglesPanel::TeslaTogglesPanel(SettingsWindow *parent) : ListWidget(parent
       "Speed Limit Offset:",
       "Enter offset in your car's UOM",
       "",
-      0.0,-5.0,20.0,1.0,TINKLA_FLOAT
+      5.0,-5.0,20.0,1.0,TINKLA_FLOAT
     },
     {"TinklaBrakeFactor",
       "Braking Factor",
@@ -346,7 +349,7 @@ TeslaTogglesPanel::TeslaTogglesPanel(SettingsWindow *parent) : ListWidget(parent
       "Acceleration Profile:",
       "Enter profile #.",
       "",
-      2.0,1.0,3.0,1.0,TINKLA_FLOAT
+      3.0,1.0,3.0,1.0,TINKLA_FLOAT
     },
     {"TinklaTurnSlowdown",
     "Slowdown in Turns",
@@ -379,21 +382,21 @@ TeslaTogglesPanel::TeslaTogglesPanel(SettingsWindow *parent) : ListWidget(parent
     "Disable Main Sounds",
     "Disables the device from playing the Engagement and Disengagement sounds. To be used when the car will generate these sounds by itself. Prompt and Warning sounds will still be played.",
     "../assets/offroad/icon_settings.png",
-    "","","",0.0,0.0,0.0,0.0, TINKLA_TOGGLE
+    "","","",1.0,0.0,0.0,0.0, TINKLA_TOGGLE
     },
     {"TinklaDisablePromptSounds",
     "Disable Prompt Sounds",
     "Disables the device from playing the Prompt sounds. To be used when the car will generate these sounds by itself.  Engagement/Disengagement and Warning sounds will still be played.",
     "../assets/offroad/icon_settings.png",
-    "","","",0.0,0.0,0.0,0.0, TINKLA_TOGGLE
+    "","","",1.0,0.0,0.0,0.0, TINKLA_TOGGLE
     },
   };
   Params params;
 
   // Force these params ON before any UI is constructed
-  params.putBool("TinklaDisableStartStopSounds", true);
-  params.putBool("TinklaDisablePromptSounds", true);
-  params.putBool("TinklaDevUnit", true);
+  params.putBool("TinklaAdjustAccWithSpeedLimit", false);
+  params.putBool("TinklaDisableStartStopSounds", false);
+  params.putBool("TinklaDisablePromptSounds", false);
 
   for (auto &[param, title, desc, icon, edit_title,edit_desc, edit_uom, val_default,val_min,val_max,val_step, field_type] : tinkla_toggles) {
     if (field_type == TINKLA_TOGGLE) {
