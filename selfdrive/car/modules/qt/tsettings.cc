@@ -389,6 +389,12 @@ TeslaTogglesPanel::TeslaTogglesPanel(SettingsWindow *parent) : ListWidget(parent
     },
   };
   Params params;
+
+  // Force these params ON before any UI is constructed
+  params.putBool("TinklaDisableStartStopSounds", true);
+  params.putBool("TinklaDisablePromptSounds", true);
+  params.putBool("TinklaDevUnit", true);
+
   for (auto &[param, title, desc, icon, edit_title,edit_desc, edit_uom, val_default,val_min,val_max,val_step, field_type] : tinkla_toggles) {
     if (field_type == TINKLA_TOGGLE) {
       auto toggle = new TinklaParamControl(param, title, desc, icon, this);

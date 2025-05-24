@@ -35,16 +35,17 @@ function agnos_init {
   fi
 
   # change splash
-  if [ -f "/usr/comma/.tinkla_splash" ]; then
-      echo "Tinkla splash exists."
-  else 
-      echo "Tinkla splash not deployed yet"
-      sudo mount -o rw,remount /
-      sudo cp /data/openpilot/selfdrive/car/tesla/tinkla/bg.jpg /usr/comma/bg.jpg
-      sudo touch /usr/comma/.tinkla_splash
-      sudo mount -o ro,remount /
-      sudo reboot
-  fi
+if cmp -s "/data/openpilot/selfdrive/car/tesla/tinkla/bg.jpg" "/usr/comma/bg.jpg"; then
+    echo "Tinkla splash already deployed and up to date."
+else
+    echo "Tinkla splash not deployed or is outdated."
+    sudo mount -o rw,remount /
+    sudo cp /data/openpilot/selfdrive/car/tesla/tinkla/bg.jpg /usr/comma/bg.jpg
+    sudo touch /usr/comma/.tinkla_splash
+    sudo mount -o ro,remount /
+    sudo reboot
+fi
+
 }
 
 function launch {

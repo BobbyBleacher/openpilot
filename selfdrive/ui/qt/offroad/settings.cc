@@ -386,7 +386,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QFrame(parent) {
     {tr("Network"), new Networking(this)},
     {tr("Toggles"), toggles},
     {tr("Tinkla"), new TinklaTogglesPanel(this)},
-    {tr("Tesla preAP"), new TeslaPreApTogglesPanel(this)},
+    //{tr("Tesla preAP"), new TeslaPreApTogglesPanel(this)},
     {tr("Tesla"), new TeslaTogglesPanel(this)},
     {tr("Software"), new SoftwarePanel(this)},
   };

@@ -367,12 +367,12 @@ class Controls:
     has_disable_events = self.events.contains(ET.NO_ENTRY) and (self.events.contains(ET.SOFT_DISABLE) or self.events.contains(ET.IMMEDIATE_DISABLE))
     no_system_errors = (not has_disable_events) or (len(self.events) == num_events)
     if (not self.sm.all_checks() or can_rcv_timeout) and no_system_errors:
-      if not self.sm.all_alive():
-        self.events.add(EventName.commIssue)
-      elif not self.sm.all_freq_ok():
-        self.events.add(EventName.commIssueAvgFreq)
-      else:  # invalid or can_rcv_timeout.
-        self.events.add(EventName.commIssue)
+      #if not self.sm.all_alive():
+      #  self.events.add(EventName.commIssue)
+      #elif not self.sm.all_freq_ok():
+      #  self.events.add(EventName.commIssueAvgFreq)
+      #else:  # invalid or can_rcv_timeout.
+      #  self.events.add(EventName.commIssue)
 
       logs = {
         'invalid': [s for s, valid in self.sm.valid.items() if not valid],
@@ -393,8 +393,8 @@ class Controls:
         self.events.add(EventName.posenetInvalid)
       if not self.sm['liveLocationKalman'].deviceStable:
         self.events.add(EventName.deviceFalling)
-      if not self.sm['liveLocationKalman'].inputsOK:
-        self.events.add(EventName.locationdTemporaryError)
+      #if not self.sm['liveLocationKalman'].inputsOK:
+      #  self.events.add(EventName.locationdTemporaryError)
       if not self.sm['liveParameters'].valid and not TESTING_CLOSET and (not SIMULATION or REPLAY):
         self.events.add(EventName.paramsdTemporaryError)
 
