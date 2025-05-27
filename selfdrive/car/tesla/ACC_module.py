@@ -248,8 +248,9 @@ class ACCController:
         if set_speed_limit_active and speed_limit_kph > 0:
             self.speed_limit_kph = speed_limit_kph + speed_limit_offset
             if int(self.prev_speed_limit_kph) != int(self.speed_limit_kph):
-                self.acc_speed_kph = self.speed_limit_kph
-                self.fleet_speed.reset_averager()
+                if self.acc_speed_kph < self.speed_limit_kph:
+                    self.acc_speed_kph = self.speed_limit_kph
+                    self.fleet_speed.reset_averager()
         else:  # reset internal speed limit, so double pull doesn't set higher speed than current (e.g. after leaving the highway)
             self.speed_limit_kph = 0.0
         current_time_ms = _current_time_millis()

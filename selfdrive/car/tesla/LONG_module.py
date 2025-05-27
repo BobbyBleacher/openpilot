@@ -172,7 +172,7 @@ class LONGController:
                     self.v_target,
                     self.speed_limit_ms * CV.MS_TO_KPH,
                     self.set_speed_limit_active,
-                    self.speed_limit_offset_uom,
+                    self.speed_limit_offset_ms * CV.MS_TO_KPH,
                 )
                 if cruise_btn:
                     # insert the message first since it is racing against messages from the real stalk
