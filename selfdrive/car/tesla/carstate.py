@@ -322,17 +322,16 @@ class CarState(CarStateBase):
       ret.cruiseState.available = True
       ret.cruiseState.standstill = ret.standstill
 
-    #speed limit
+    # speed limit
     msu = cp.vl['UI_gpsVehicleSpeed']["UI_mapSpeedLimitUnits"]
     map_speed_uom_to_ms = CV.KPH_TO_MS if msu == 1 else CV.MPH_TO_MS
     map_speed_ms_to_uom = CV.MS_TO_KPH if msu == 1 else CV.MS_TO_MPH
-    
+
     speed_limit_type = int(cp.vl["UI_driverAssistMapData"]["UI_mapSpeedLimit"])
     rdSignMsg = cp.vl["UI_driverAssistRoadSign"]["UI_roadSign"]
     if rdSignMsg == 3: # ROAD_SIGN_SPEED_LIMIT
-      self.baseMapSpeedLimitMPS = cp.vl["UI_driverAssistRoadSign"]["UI_baseMapSpeedLimitMPS"]
-      # we round the speed limit in the map's units of measurement to fix noisy data (there are no signs with a limit of 79.2 kph)
-      self.baseMapSpeedLimitMPS = int(self.baseMapSpeedLimitMPS * map_speed_ms_to_uom + 0.99) / map_speed_ms_to_uom
+        self.baseMapSpeedLimitMPS = cp.vl["UI_driverAssistRoadSign"]["UI_baseMapSpeedLimitMPS"]
+        self.baseMapSpeedLimitMPS = int(self.baseMapSpeedLimitMPS * map_speed_ms_to_uom + 0.99) / map_speed_ms_to_uom
     if rdSignMsg == 4:  # ROAD_SIGN_SPEED_SPLINE
         self.meanFleetSplineSpeedMPS = cp.vl["UI_driverAssistRoadSign"]["UI_meanFleetSplineSpeedMPS"]
         self.meanFleetSplineAccelMPS2 = cp.vl["UI_driverAssistRoadSign"]["UI_meanFleetSplineAccelMPS2"]
@@ -340,37 +339,34 @@ class CarState(CarStateBase):
         self.splineLocConfidence = cp.vl["UI_driverAssistRoadSign"]["UI_splineLocConfidence"]
         self.UI_splineID = cp.vl["UI_driverAssistRoadSign"]["UI_splineID"]
         self.rampType = cp.vl["UI_driverAssistRoadSign"]["UI_rampType"]
-    if self.rampType > 0:
-        # we are on a ramp, use the spline info if available
-        if self.splineBasedSuggestedSpeed > 0:
-            self.map_suggested_speed = self.splineBasedSuggestedSpeed
-        else:
-            self.map_suggested_speed = self.mapBasedSuggestedSpeed
+
+    # Prioritize traffic sign speed limit when detected
+    if rdSignMsg == 3 and self.baseMapSpeedLimitMPS > 0:
+        self.speed_limit_ms = self.baseMapSpeedLimitMPS
+    elif self.CP.carFingerprint != CAR.PREAP_MODELS and self.baseMapSpeedLimitMPS > 0 and (speed_limit_type != 0x1F or self.baseMapSpeedLimitMPS >= 5.56):
+        self.speed_limit_ms = self.baseMapSpeedLimitMPS
     else:
-        # we are on a normal road, use max of the two
-        self.map_suggested_speed = max(
-            self.mapBasedSuggestedSpeed, self.splineBasedSuggestedSpeed
-        )
+        new_speed_limit_ms = cp.vl['UI_gpsVehicleSpeed']["UI_mppSpeedLimit"] * map_speed_uom_to_ms
+        # Prevent GPS-based drops > 5 MPH unless traffic sign detected
+        if self.speed_limit_ms > 0 and rdSignMsg != 3 and new_speed_limit_ms < self.speed_limit_ms - 2.235:
+            new_speed_limit_ms = self.speed_limit_ms
+        self.speed_limit_ms = new_speed_limit_ms
+
     if self.CP.carFingerprint in [CAR.AP1_MODELS, CAR.AP1_MODELX, CAR.AP2_MODELS, CAR.AP2_MODELX]:
-      self.speed_limit_ms_das = cp_cam.vl["DAS_status"]["DAS_fusedSpeedLimit"] / map_speed_ms_to_uom
-      if cp_cam.vl["DAS_status"]["DAS_fusedSpeedLimit"] >= 150:
-        #set to 150 when unlimitted
-        self.speed_limit_ms_das = 150. / map_speed_ms_to_uom
-    if self.CP.carFingerprint != CAR.PREAP_MODELS and self.baseMapSpeedLimitMPS > 0 and (speed_limit_type != 0x1F or self.baseMapSpeedLimitMPS >= 5.56):
-      self.speed_limit_ms = self.baseMapSpeedLimitMPS # this one is earlier than the actual sign but can also be unreliable, so we ignore it on SNA at higher speeds
-    else:
-      self.speed_limit_ms = cp.vl['UI_gpsVehicleSpeed']["UI_mppSpeedLimit"] * map_speed_uom_to_ms
+        self.speed_limit_ms_das = cp_cam.vl["DAS_status"]["DAS_fusedSpeedLimit"] / map_speed_ms_to_uom
+        if cp_cam.vl["DAS_status"]["DAS_fusedSpeedLimit"] >= 150:
+            self.speed_limit_ms_das = 150. / map_speed_ms_to_uom
     if self.CP.carFingerprint != CAR.PREAP_MODELS:
-      self.DAS_fusedSpeedLimit = cp_cam.vl["DAS_status"]["DAS_fusedSpeedLimit"]
+        self.DAS_fusedSpeedLimit = cp_cam.vl["DAS_status"]["DAS_fusedSpeedLimit"]
     else:
-      self.DAS_fusedSpeedLimit = self._convert_to_DAS_fusedSpeedLimit(self.speed_limit_ms * map_speed_ms_to_uom, speed_limit_type)
-    
+        self.DAS_fusedSpeedLimit = self._convert_to_DAS_fusedSpeedLimit(self.speed_limit_ms * map_speed_ms_to_uom, speed_limit_type)
+
     if self.DAS_fusedSpeedLimit > 1:
-      self.fleet_speed_state = 2
+        self.fleet_speed_state = 2
     else:
-      self.fleet_speed_state = 0
+        self.fleet_speed_state = 0
     if self.speed_limit_ms_das > 0:
-      self.speed_limit_ms = min(self.speed_limit_ms_das,self.speed_limit_ms)
+        self.speed_limit_ms = min(self.speed_limit_ms_das, self.speed_limit_ms)
     self.userSpeedLimitOffsetMS = cp.vl["UI_gpsVehicleSpeed"]["UI_userSpeedOffset"]
     self.compute_speed()
     #Map based data
