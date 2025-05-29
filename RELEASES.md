@@ -1,3 +1,7 @@
+Version 0.9.6-beta65 (2025-05-29)
+========================
+* Continued attempts at fixing ACC bugs
+
 Version 0.9.6-beta64 (2025-05-24)
 ========================
 * Remove nuisance messages
