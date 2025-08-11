@@ -60,12 +60,12 @@ WiFiPromptWidget::WiFiPromptWidget(QWidget *parent) : QFrame(parent) {
   {
     QHBoxLayout *title_layout = new QHBoxLayout;
     {
-      QLabel *title = new QLabel(tr("Ready to upload"));
+      /* QLabel *title = new QLabel(tr("Ready to upload"));
       title->setStyleSheet("font-size: 64px; font-weight: 600;");
       title->setWordWrap(true);
       title->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
       title_layout->addWidget(title);
-      title_layout->addStretch();
+      title_layout->addStretch(); */
 
       QLabel *icon = new QLabel;
       QPixmap pixmap("../assets/offroad/icon_wifi_uploading.svg");
