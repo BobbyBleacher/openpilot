@@ -127,11 +127,7 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
       },
   };
   Params params;
-
-  if (!params.exists("TinklaDevUnit")) {
-    params.putBool("TinklaDevUnit", true);
-  }
-
+  
   for (auto &[param, title, desc, icon, edit_title,edit_desc, edit_uom, val_default,val_min,val_max,val_step, field_type] : tinkla_toggles) {
     if (field_type == TINKLA_TOGGLE) {
       auto toggle = new TinklaParamControl(param, title, desc, icon, this);
@@ -152,6 +148,7 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
       addItem(new TextParamControl(title, desc, edit_title,edit_desc, param, edit_uom, QString::fromStdString(""), icon));
     }
   };
+  params.putBool("TinklaDevUnit", true);
 }
 
 TeslaPreApTogglesPanel::TeslaPreApTogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
