@@ -28,7 +28,7 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
       "../assets/offroad/icon_settings.png",
       "Fingerprint:",
       "TESLA PREAP MODEL S,TESLA AP1 MODEL S,TESLA AP1 MODEL X,TESLA AP2+ MODEL S,TESLA AP2+ MODEL X,NONE",
-      "TESLA AP1 MODEL S",
+      "NONE",
       0.0,0.0,0.0,0.0,TINKLA_STRING
     },
     {"TinklaYourMapboxToken",
@@ -127,7 +127,7 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
       },
   };
   Params params;
-  
+
   for (auto &[param, title, desc, icon, edit_title,edit_desc, edit_uom, val_default,val_min,val_max,val_step, field_type] : tinkla_toggles) {
     if (field_type == TINKLA_TOGGLE) {
       auto toggle = new TinklaParamControl(param, title, desc, icon, this);
