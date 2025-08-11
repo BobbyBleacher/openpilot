@@ -250,10 +250,15 @@ class Controls:
       self.events.add(EventName.resumeBlocked)
 
     # Disable on rising edge of accelerator or brake. Also disable on brake when speed > 0
+    # if (CS.gasPressed and not self.CS_prev.gasPressed and self.disengage_on_accelerator) or \
+    #   (CS.brakePressed and (not self.CS_prev.brakePressed or not CS.standstill)) or \
+    #   (CS.regenBraking and (not self.CS_prev.regenBraking or not CS.standstill)):
+    #   self.events.add(EventName.pedalPressed)
+    
+    # We want to keep lateral control active even if the brake is pressed (so we can slow to a stop while still steering)
     if (CS.gasPressed and not self.CS_prev.gasPressed and self.disengage_on_accelerator) or \
-      (CS.brakePressed and (not self.CS_prev.brakePressed or not CS.standstill)) or \
-      (CS.regenBraking and (not self.CS_prev.regenBraking or not CS.standstill)):
-      self.events.add(EventName.pedalPressed)
+       (CS.regenBraking and (not self.CS_prev.regenBraking or not CS.standstill)):
+       self.events.add(EventName.pedalPressed)
 
     if CS.brakePressed and CS.standstill:
       self.events.add(EventName.preEnableStandstill)
