@@ -28,7 +28,7 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
       "../assets/offroad/icon_settings.png",
       "Fingerprint:",
       "TESLA PREAP MODEL S,TESLA AP1 MODEL S,TESLA AP1 MODEL X,TESLA AP2+ MODEL S,TESLA AP2+ MODEL X,NONE",
-      "NONE",
+      "TESLA AP1 MODEL S",
       0.0,0.0,0.0,0.0,TINKLA_STRING
     },
     {"TinklaYourMapboxToken",
@@ -47,7 +47,7 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
       "HSO numb period:",
       "Enter time in seconds.",
       "s",
-      1.5,0.5,3.0,0.5,TINKLA_FLOAT
+      1.0,0.5,3.0,0.5,TINKLA_FLOAT
     },
 
     {"TinklaAlcDelay",
@@ -57,7 +57,7 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
       "ALC delay:",
       "Enter time in seconds.",
       "s",
-      0.5,1.0,3.0,0.5,TINKLA_FLOAT
+      0.5,0.5,3.0,0.5,TINKLA_FLOAT
     },
     {"TinklaExpModelAutoswitch",
       "Experimental Mode Autoswitch",
@@ -128,7 +128,9 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
   };
   Params params;
 
-  //params.putBool("TinklaDevUnit", false);
+  if (!params.exists("TinklaDevUnit")) {
+    params.putBool("TinklaDevUnit", true);
+  }
 
   for (auto &[param, title, desc, icon, edit_title,edit_desc, edit_uom, val_default,val_min,val_max,val_step, field_type] : tinkla_toggles) {
     if (field_type == TINKLA_TOGGLE) {
@@ -395,8 +397,8 @@ TeslaTogglesPanel::TeslaTogglesPanel(SettingsWindow *parent) : ListWidget(parent
 
   // Force these params ON before any UI is constructed
   // params.putBool("TinklaAdjustAccWithSpeedLimit", false);
-  // params.putBool("TinklaDisableStartStopSounds", false);
-  // params.putBool("TinklaDisablePromptSounds", false);
+  params.putBool("TinklaDisableStartStopSounds", true);
+  params.putBool("TinklaDisablePromptSounds", true);
 
   for (auto &[param, title, desc, icon, edit_title,edit_desc, edit_uom, val_default,val_min,val_max,val_step, field_type] : tinkla_toggles) {
     if (field_type == TINKLA_TOGGLE) {
