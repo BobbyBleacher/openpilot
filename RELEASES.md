@@ -1,3 +1,7 @@
+Version 0.9.6-beta66 (2025-08-10)
+========================
+* QoL Fixes
+
 Version 0.9.6-beta65 (2025-05-29)
 ========================
 * Continued attempts at fixing ACC bugs
