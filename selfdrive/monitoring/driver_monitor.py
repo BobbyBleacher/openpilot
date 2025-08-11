@@ -302,6 +302,8 @@ class DriverStatus():
       self.hi_stds = 0
 
   def update_events(self, events, driver_engaged, ctrl_active, standstill):
+    self._reset_awareness()
+    return
     if (driver_engaged and self.awareness > 0 and not self.active_monitoring_mode) or not ctrl_active or self.dev_unit: # reset only when on disengagement if red reached
       self._reset_awareness()
       return
