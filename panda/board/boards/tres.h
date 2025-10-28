@@ -79,6 +79,7 @@ const board board_tres = {
   .has_canfd = true,
   .has_rtc_battery = true,
   .fan_max_rpm = 5000U,
+  .fan_max_pwm = 100U,
   .avdd_mV = 1800U,
   .fan_stall_recovery = true,
   .fan_enable_cooldown_time = 3U,
