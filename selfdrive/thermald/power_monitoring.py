@@ -111,22 +111,23 @@ class PowerMonitoring:
 
   # See if we need to shutdown
   def should_shutdown(self, ignition: bool, in_car: bool, offroad_timestamp: Optional[float], started_seen: bool):
-    if offroad_timestamp is None:
-      return False
+    return False
+    # if offroad_timestamp is None:
+    #   return False
 
-    now = time.monotonic()
-    should_shutdown = False
-    offroad_time = (now - offroad_timestamp)
-    low_voltage_shutdown = (self.car_voltage_mV < (VBATT_PAUSE_CHARGING * 1e3) and
-                            self.car_voltage_instant_mV > (VBATT_INSTANT_PAUSE_CHARGING * 1e3) and
-                            offroad_time > VOLTAGE_SHUTDOWN_MIN_OFFROAD_TIME_S)
-    should_shutdown |= offroad_time > MAX_TIME_OFFROAD_S
-    should_shutdown |= low_voltage_shutdown
-    should_shutdown |= (self.car_battery_capacity_uWh <= 0)
-    should_shutdown &= not ignition
-    should_shutdown &= (not self.params.get_bool("DisablePowerDown"))
-    should_shutdown &= in_car
-    should_shutdown &= offroad_time > DELAY_SHUTDOWN_TIME_S
-    should_shutdown |= self.params.get_bool("ForcePowerDown")
-    should_shutdown &= started_seen or (now > MIN_ON_TIME_S)
-    return should_shutdown
+    # now = time.monotonic()
+    # should_shutdown = False
+    # offroad_time = (now - offroad_timestamp)
+    # low_voltage_shutdown = (self.car_voltage_mV < (VBATT_PAUSE_CHARGING * 1e3) and
+    #                         self.car_voltage_instant_mV > (VBATT_INSTANT_PAUSE_CHARGING * 1e3) and
+    #                         offroad_time > VOLTAGE_SHUTDOWN_MIN_OFFROAD_TIME_S)
+    # should_shutdown |= offroad_time > MAX_TIME_OFFROAD_S
+    # should_shutdown |= low_voltage_shutdown
+    # should_shutdown |= (self.car_battery_capacity_uWh <= 0)
+    # should_shutdown &= not ignition
+    # should_shutdown &= (not self.params.get_bool("DisablePowerDown"))
+    # should_shutdown &= in_car
+    # should_shutdown &= offroad_time > DELAY_SHUTDOWN_TIME_S
+    # should_shutdown |= self.params.get_bool("ForcePowerDown")
+    # should_shutdown &= started_seen or (now > MIN_ON_TIME_S)
+    # return should_shutdown
