@@ -253,6 +253,12 @@ def thermald_thread(end_event, hw_queue) -> None:
 
     msg.deviceState.networkType = last_hw_state.network_type
     msg.deviceState.networkMetered = last_hw_state.network_metered
+    #Change to see fanspeed 26 Jul 2026 0740
+    cloudlog.warning(
+      f"fan temp={all_comp_temp:.2f} "
+      f"desired={msg.deviceState.fanSpeedPercentDesired}"
+    )
+    #endchange
     msg.deviceState.networkStrength = last_hw_state.network_strength
     msg.deviceState.networkStats = last_hw_state.network_stats
     if last_hw_state.network_info is not None:

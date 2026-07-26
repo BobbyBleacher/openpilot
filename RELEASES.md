@@ -1,3 +1,7 @@
+Version 0.9.6-beta68 (2025-10-28)
+========================
+* Fan speed/spin/stall modifications
+
 Version 0.9.6-beta67 (2025-10-28)
 ========================
 * Fan speed/spin/stall Fixes
