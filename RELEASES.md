@@ -1,4 +1,8 @@
-Version 0.9.6-beta68 (2025-10-28)
+Version 0.9.6-beta69 (2026-07-26)
+========================
+* Keep OP engaged after brake press
+
+Version 0.9.6-beta68 (2025-07-26)
 ========================
 * Fan speed/spin/stall modifications
 

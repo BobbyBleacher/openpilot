@@ -300,12 +300,22 @@ class CarState(CarStateBase):
       acc_enabled = (cruise_state in ["ENABLED", "STANDSTILL", "OVERRIDE", "PRE_FAULT", "PRE_CANCEL"])
       self.autopilot_enabled = (autopilot_status in ["ACTIVE_1", "ACTIVE_2"]) #, "ACTIVE_NAVIGATE_ON_AUTOPILOT"])
       cruiseEnabled = acc_enabled and not self.autopilot_enabled and not summon_or_autopark_enabled
+
       if self.autopilot_enabled:
         self.autopilot_was_enabled = True
-      if not(self.autopilot_enabled or cruiseEnabled):
+
+      if not (self.autopilot_enabled or cruiseEnabled):
         self.autopilot_was_enabled = False
-      self.cruiseEnabled = cruiseEnabled and not self.autopilot_was_enabled
+
+      # Latch openpilot engagement until the driver presses stalk cancel.
+      if cruiseEnabled and not self.autopilot_was_enabled:
+        self.cruiseEnabled = True
+
+      if self.cruise_buttons == CruiseButtons.CANCEL:
+        self.cruiseEnabled = False
+
       ret.cruiseState.enabled = self.cruiseEnabled and self.cruiseDelay and not self.enableACC
+      
       if self.speed_units == "KPH":
         ret.cruiseState.speed = cp.vl["DI_state"]["DI_cruiseSet"] * CV.KPH_TO_MS
       elif self.speed_units == "MPH":

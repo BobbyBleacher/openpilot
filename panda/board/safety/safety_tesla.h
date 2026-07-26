@@ -1009,8 +1009,8 @@ static void tesla_rx_hook(CANPacket_t *to_push) {
           time_cruise_engaged = 0;
         }
 
-        if (time_cruise_engaged == 0) {
-          controls_allowed = cruise_engaged;
+        if ((time_cruise_engaged == 0) && cruise_engaged) {
+          controls_allowed = true;
         }
         if ((cruise_engaged_prev) && (!cruise_engaged)) {
           //set timer since we have AP and we need to mask some messages for few seconds
