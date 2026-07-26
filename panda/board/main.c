@@ -253,7 +253,8 @@ void tick_handler(void) {
           // * bootloader enables the SOM GPIO on boot
           // * fallback to USB enumerated where supported
           bool enabled = usb_enumerated || current_board->read_som_gpio();
-          fan_set_power(enabled ? 50U : 0U);
+          // fan_set_power(enabled ? 50U : 0U);
+          fan_set_power(enabled ? 100U : 0U);
         }
       }
 
