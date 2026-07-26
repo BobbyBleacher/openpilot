@@ -21,6 +21,7 @@ class TiciFanController(BaseFanController):
     self.controller = PIDController(k_p=0, k_i=4e-3, k_f=1, rate=(1 / DT_TRML))
 
   def update(self, cur_temp: float, ignition: bool) -> int:
+    return 100
     self.controller.neg_limit = -(100 if ignition else 30)
     self.controller.pos_limit = -(30 if ignition else 0)
 
@@ -34,6 +35,6 @@ class TiciFanController(BaseFanController):
                     ))
 
     self.last_ignition = ignition
-    #return fan_pwr_out
-    return 100
+    return fan_pwr_out
+    
 
