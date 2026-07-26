@@ -68,6 +68,7 @@ bool do_radar_emulation = false;
 bool enable_hao = false;
 bool tesla_longitudinal = false;
 bool tesla_powertrain = false;  // Are we the second panda intercepting the powertrain bus?
+static bool tesla_lateral_allowed = false;
 
 bool bosch_radar_vin_learn = false;
 bool has_das_hw = false;
@@ -931,6 +932,7 @@ static void tesla_rx_hook(CANPacket_t *to_push) {
           { // push towards the back
             // deactivate openpilot
             pcm_cruise_check(false);
+            tesla_lateral_allowed = false;
             //cruise_engaged_prev = false;
           }
           //if using pedal, send a cancel immediately to cancel the CC
@@ -1011,6 +1013,7 @@ static void tesla_rx_hook(CANPacket_t *to_push) {
 
         if ((time_cruise_engaged == 0) && cruise_engaged) {
           controls_allowed = true;
+          tesla_lateral_allowed = true;
         }
         if ((cruise_engaged_prev) && (!cruise_engaged)) {
           //set timer since we have AP and we need to mask some messages for few seconds
@@ -1032,6 +1035,7 @@ static void tesla_rx_hook(CANPacket_t *to_push) {
                           //(autopilot_status == 5);    // ACTIVE_NAVIGATE_ON_AUTOPILOT
       if (autopilot_enabled || eac_enabled || autopark_enabled) {
         controls_allowed = false;
+        tesla_lateral_allowed = false;
       }
     }
 
@@ -1043,6 +1047,7 @@ static void tesla_rx_hook(CANPacket_t *to_push) {
       autopark_enabled = (psc_status == 14) || ((psc_status >= 1) && (psc_status <=8));
       if (autopilot_enabled || eac_enabled || autopark_enabled) {
         controls_allowed = false;
+        tesla_lateral_allowed = false;
       }
     }
 
@@ -1124,16 +1129,16 @@ static bool tesla_tx_hook(CANPacket_t *to_send) {
     desired_angle_last = desired_angle;
 
     // Angle should be the same as current angle while not steering
-    if(!controls_allowed && ((desired_angle < (angle_meas.min - 1)) || (desired_angle > (angle_meas.max + 1)))) {
+    if(!tesla_lateral_allowed && ((desired_angle < (angle_meas.min - 1)) || (desired_angle > (angle_meas.max + 1)))) {
       violation = !human_steering ;
     }
 
     // No angle control allowed when controls are not allowed
-    if(!controls_allowed && steer_control_enabled) {
+    if(!tesla_lateral_allowed && steer_control_enabled) {
       violation = !human_steering;
     }
 
-    if (controls_allowed && steer_angle_cmd_checks(desired_angle, steer_control_enabled, TESLA_STEERING_LIMITS)) {
+    if (tesla_lateral_allowed && steer_angle_cmd_checks(desired_angle, steer_control_enabled, TESLA_STEERING_LIMITS)) {
       violation = true;
     }
   }

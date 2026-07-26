@@ -307,10 +307,16 @@ class CarState(CarStateBase):
       if not (self.autopilot_enabled or cruiseEnabled):
         self.autopilot_was_enabled = False
 
-      # Latch openpilot engagement until the driver presses stalk cancel.
+      # Latch Openpilot lateral after TACC has engaged.
       if cruiseEnabled and not self.autopilot_was_enabled:
         self.cruiseEnabled = True
 
+      # Explicitly hand control back to Tesla when stock Autosteer,
+      # Enhanced Autopilot, or Autopark becomes active.
+      if self.autopilot_enabled or summon_or_autopark_enabled:
+        self.cruiseEnabled = False
+
+      # Stalk cancel always disables Openpilot lateral.
       if self.cruise_buttons == CruiseButtons.CANCEL:
         self.cruiseEnabled = False
 

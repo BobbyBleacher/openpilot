@@ -62,6 +62,8 @@ class Controls:
   def __init__(self, CI=None):
     config_realtime_process(4, Priority.CTRL_HIGH)
 
+    self.tesla_lateral_only = False
+
     # Ensure the current branch is cached, otherwise the first iteration of controlsd lags
     self.branch = get_short_branch("")
 
@@ -485,8 +487,19 @@ class Controls:
       self.mismatch_counter = 0
 
     # All pandas not in silent mode must have controlsAllowed when openpilot is enabled
-    if self.enabled and any(not ps.controlsAllowed for ps in self.sm['pandaStates']
-           if ps.safetyModel not in IGNORED_SAFETY_MODES):
+    tesla_lateral_only = self.CP.carName == "tesla" and CS.brakePressed
+
+    if self.CP.carName == "tesla":
+      if self.enabled and CS.brakePressed:
+        self.tesla_lateral_only = True
+
+      if not self.enabled:
+        self.tesla_lateral_only = False
+
+    if self.enabled and not tesla_lateral_only and any(
+        not ps.controlsAllowed for ps in self.sm['pandaStates']
+        if ps.safetyModel not in IGNORED_SAFETY_MODES
+    ):
       self.mismatch_counter += 1
 
     self.distance_traveled += CS.vEgo * DT_CTRL
