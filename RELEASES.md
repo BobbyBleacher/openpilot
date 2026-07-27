@@ -1,3 +1,7 @@
+Version 0.9.6-beta70 (2026-07-26)
+========================
+* Keep OP engaged after brake press
+
 Version 0.9.6-beta69 (2026-07-26)
 ========================
 * Keep OP engaged after brake press
