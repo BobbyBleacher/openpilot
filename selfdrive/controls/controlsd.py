@@ -496,7 +496,7 @@ class Controls:
       if not self.enabled:
         self.tesla_lateral_only = False
 
-    if self.enabled and not tesla_lateral_only and any(
+    if self.enabled and not self.tesla_lateral_only and any(
         not ps.controlsAllowed for ps in self.sm['pandaStates']
         if ps.safetyModel not in IGNORED_SAFETY_MODES
     ):

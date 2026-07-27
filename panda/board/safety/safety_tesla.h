@@ -1033,7 +1033,7 @@ static void tesla_rx_hook(CANPacket_t *to_push) {
       autopilot_enabled = (autopilot_status == 3) ||  // ACTIVE_1
                           (autopilot_status == 4);// ||  // ACTIVE_2
                           //(autopilot_status == 5);    // ACTIVE_NAVIGATE_ON_AUTOPILOT
-      if (autopilot_enabled || eac_enabled || autopark_enabled) {
+      if (autopilot_enabled || autopark_enabled) {
         controls_allowed = false;
         tesla_lateral_allowed = false;
       }
@@ -1045,7 +1045,7 @@ static void tesla_rx_hook(CANPacket_t *to_push) {
       int eac_status = (GET_BYTE(to_push, 1) & 0x07);
       eac_enabled = (eac_status == 2);
       autopark_enabled = (psc_status == 14) || ((psc_status >= 1) && (psc_status <=8));
-      if (autopilot_enabled || eac_enabled || autopark_enabled) {
+      if (autopilot_enabled || autopark_enabled) {
         controls_allowed = false;
         tesla_lateral_allowed = false;
       }
