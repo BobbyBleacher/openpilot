@@ -91,7 +91,7 @@ class CarController:
       # Use Tesla longitudinal whenever the vehicle's real cruise system
       # is active. OP remains responsible for lateral unless stock
       # Autopilot/Autosteer becomes active.
-      tesla_cruise_active = CruiseState.is_enabled_or_standby(CS.cruise_state)
+      tesla_cruise_active = CS.tesla_acc_enabled
 
       CS.enableACC = tesla_cruise_active
 
@@ -139,20 +139,43 @@ class CarController:
     
 
     if (self.frame % self.CCP.STEER_STEP == 0) and (CC.latActive or (self.CP.carFingerprint == CAR.PREAP_MODELS)):
-      #now process controls
-      if CC.latActive and (not CS.human_control) and (not CS.out.cruiseState.standstill):
-        # Angular rate limit based on speed
-        apply_angle = apply_std_steer_angle_limits(actuators.steeringAngleDeg, self.apply_angle_last, CS.out.vEgo, self.CCP)
+      # Keep Tesla lateral control available after TACC is cancelled by a brake
+      # press. Driver steering torque is still handled by Panda angle limits and
+      # the normal Openpilot steering-override events.
+      steer_enabled = CC.latActive and not CS.out.cruiseState.standstill
 
-        # To not fault the EPS
-        apply_angle = clip(apply_angle, CS.out.steeringAngleDeg - 20, CS.out.steeringAngleDeg + 20)
+      if steer_enabled:
+        # Angular rate limit based on speed
+        apply_angle = apply_std_steer_angle_limits(
+          actuators.steeringAngleDeg,
+          self.apply_angle_last,
+          CS.out.vEgo,
+          self.CCP,
+        )
+
+        # Keep the requested angle close enough to the measured angle to avoid
+        # faulting EPAS.
+        apply_angle = clip(
+          apply_angle,
+          CS.out.steeringAngleDeg - 20,
+          CS.out.steeringAngleDeg + 20,
+        )
       else:
         apply_angle = CS.out.steeringAngleDeg
-        
+
       ldw_haptic = 0
       if CC.hudControl.leftLaneDepart or CC.hudControl.rightLaneDepart:
         ldw_haptic = 1
-      can_sends.append(self.tesla_can.create_steering_control(apply_angle, CC.latActive and (not CS.human_control) and (not CS.out.cruiseState.standstill), ldw_haptic, CAN_EPAS[self.CP.carFingerprint], 1))
+
+      can_sends.append(
+        self.tesla_can.create_steering_control(
+          apply_angle,
+          steer_enabled,
+          ldw_haptic,
+          CAN_EPAS[self.CP.carFingerprint],
+          1,
+        )
+      )
 
       self.apply_angle_last = apply_angle
 

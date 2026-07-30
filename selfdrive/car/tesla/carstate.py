@@ -36,6 +36,7 @@ class CarState(CarStateBase):
     self.cruiseDelay = False
     self.carNotInDrive = True
     self.autopilot_was_enabled = False
+    self.tesla_acc_enabled = False
 
     #to control hazard lighgts
     self.needs_hazard = False
@@ -298,6 +299,7 @@ class CarState(CarStateBase):
     
     if (self.CP.carFingerprint != CAR.PREAP_MODELS) and (not self.autopilot_disabled):
       acc_enabled = (cruise_state in ["ENABLED", "STANDSTILL", "OVERRIDE", "PRE_FAULT", "PRE_CANCEL"])
+      self.tesla_acc_enabled = acc_enabled
       self.autopilot_enabled = (autopilot_status in ["ACTIVE_1", "ACTIVE_2"]) #, "ACTIVE_NAVIGATE_ON_AUTOPILOT"])
       cruiseEnabled = acc_enabled and not self.autopilot_enabled and not summon_or_autopark_enabled
 
