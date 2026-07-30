@@ -320,7 +320,7 @@ class CarState(CarStateBase):
       if self.cruise_buttons == CruiseButtons.CANCEL:
         self.cruiseEnabled = False
 
-      ret.cruiseState.enabled = self.cruiseEnabled and self.cruiseDelay and not self.enableACC
+      ret.cruiseState.enabled = self.cruiseEnabled and self.cruiseDelay
       
       if self.speed_units == "KPH":
         ret.cruiseState.speed = cp.vl["DI_state"]["DI_cruiseSet"] * CV.KPH_TO_MS

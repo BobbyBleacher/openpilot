@@ -88,19 +88,22 @@ class CarController:
     can_sends = []
     #add 0.6s second delay logic to wait for AP which has a status at 2Hz
     if self.CP.carFingerprint != CAR.PREAP_MODELS and not CS.autopilot_disabled:
+      # Use Tesla longitudinal whenever the vehicle's real cruise system
+      # is active. OP remains responsible for lateral unless stock
+      # Autopilot/Autosteer becomes active.
+      tesla_cruise_active = CruiseState.is_enabled_or_standby(CS.cruise_state)
+
+      CS.enableACC = tesla_cruise_active
+
       if CS.cruiseEnabled:
         if not self.prevCruiseEnabled:
           self.cruiseDelayFrame = self.frame
-          if CS.last_cruise_button == CruiseButtons.MAIN:
-            CS.enableACC = False
-          elif CS.last_cruise_button != CruiseButtons.IDLE:
-            CS.enableACC = True
+
         if self.frame - self.cruiseDelayFrame >= 100:
           CS.cruiseDelay = True
       else:
         self.cruiseDelayFrame = 0
         CS.cruiseDelay = False
-        CS.enableACC = False
     self.prevCruiseEnabled = CS.cruiseEnabled
 
     #receive socks
