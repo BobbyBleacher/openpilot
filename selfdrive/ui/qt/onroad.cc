@@ -600,6 +600,69 @@ void AnnotatedCameraWidget::drawLead(QPainter &painter, const cereal::RadarState
   painter.restore();
 }
 
+void AnnotatedCameraWidget::drawTeslaStatusBar(QPainter &painter, const UIState *s) {
+  SubMaster &sm = *(s->sm);
+
+  const auto car_state = sm["carState"].getCarState();
+  const auto car_control = sm["carControl"].getCarControl();
+
+  const bool ap_active = car_state.getTeslaAutopilotActive();
+  const bool acc_active = car_state.getTeslaAccActive();
+  const bool op_lat_active = car_control.getLatActive();
+
+  struct StatusItem {
+    const char *label;
+    bool active;
+  };
+
+  const StatusItem items[] = {
+    {"AP", ap_active},
+    {"ACC", acc_active},
+    {"OP", op_lat_active},
+  };
+
+  painter.save();
+  painter.setRenderHint(QPainter::Antialiasing);
+  painter.setRenderHint(QPainter::TextAntialiasing);
+
+  // Upper left, immediately to the right of the MAX-speed box.
+  const int start_x = 250;
+  const int start_y = 45;
+  const int box_width = 105;
+  const int box_height = 58;
+  const int spacing = 10;
+  const int radius = 14;
+
+  painter.setFont(InterFont(32, QFont::Bold));
+
+  for (int i = 0; i < 3; ++i) {
+    QRect box(
+      start_x + i * (box_width + spacing),
+      start_y,
+      box_width,
+      box_height
+    );
+
+    if (items[i].active) {
+      painter.setBrush(QColor(0x17, 0xB9, 0x57, 235));
+      painter.setPen(QPen(QColor(255, 255, 255, 220), 3));
+    } else {
+      painter.setBrush(QColor(0, 0, 0, 150));
+      painter.setPen(QPen(QColor(255, 255, 255, 80), 2));
+    }
+
+    painter.drawRoundedRect(box, radius, radius);
+
+    painter.setPen(items[i].active
+      ? QColor(255, 255, 255, 255)
+      : QColor(255, 255, 255, 115));
+
+    painter.drawText(box, Qt::AlignCenter, items[i].label);
+  }
+
+  painter.restore();
+}
+
 void AnnotatedCameraWidget::paintGL() {
   UIState *s = uiState();
   SubMaster &sm = *(s->sm);
@@ -683,6 +746,7 @@ void AnnotatedCameraWidget::paintGL() {
   }
 
   drawHud(painter);
+  drawTeslaStatusBar(painter, s);
 
   double cur_draw_t = millis_since_boot();
   double dt = cur_draw_t - prev_draw_t;

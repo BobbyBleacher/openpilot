@@ -240,6 +240,10 @@ struct CarState {
   #can error
   canErrorId @49 :UInt32;
 
+  # Tesla UI status
+  teslaAutopilotActive @50 :Bool;
+  teslaAccActive @51 :Bool;
+
   fuelGauge @41 :Float32; # battery or fuel tank level from 0.0 to 1.0
   charging @43 :Bool;
 

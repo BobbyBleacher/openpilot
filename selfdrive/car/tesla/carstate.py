@@ -301,6 +301,9 @@ class CarState(CarStateBase):
       acc_enabled = (cruise_state in ["ENABLED", "STANDSTILL", "OVERRIDE", "PRE_FAULT", "PRE_CANCEL"])
       self.tesla_acc_enabled = acc_enabled
       self.autopilot_enabled = (autopilot_status in ["ACTIVE_1", "ACTIVE_2"]) #, "ACTIVE_NAVIGATE_ON_AUTOPILOT"])
+      # UI Mode Indicators
+      ret.teslaAutopilotActive = self.autopilot_enabled
+      ret.teslaAccActive = acc_enabled
       cruiseEnabled = acc_enabled and not self.autopilot_enabled and not summon_or_autopark_enabled
 
       if self.autopilot_enabled:
@@ -339,6 +342,9 @@ class CarState(CarStateBase):
       ret.cruiseState.enabled = self.cruiseEnabled and (not ret.doorOpen) and (ret.gearShifter == car.CarState.GearShifter.drive) and (not ret.seatbeltUnlatched)
       ret.cruiseState.available = True
       ret.cruiseState.standstill = ret.standstill
+      # UI Indicators
+      ret.teslaAutopilotActive = False
+      ret.teslaAccActive = False
 
     # speed limit
     msu = cp.vl['UI_gpsVehicleSpeed']["UI_mapSpeedLimitUnits"]

@@ -183,8 +183,9 @@ class CarInterface(CarInterfaceBase):
     
     events = self.create_common_events(ret)
 
-    if self.CS.autopilot_enabled:
-      events.add(car.CarEvent.EventName.invalidLkasSetting)
+    # Stock Tesla AP status is displayed in the on-road status bar.
+      # if self.CS.autopilot_enabled:
+      #   events.add(car.CarEvent.EventName.invalidLkasSetting)
     if ret.gasPressed and self.CS.adaptive_cruise_enabled:
       events.add(EventName.gasPressed)
 
