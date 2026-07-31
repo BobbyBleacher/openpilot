@@ -1138,8 +1138,25 @@ static bool tesla_tx_hook(CANPacket_t *to_send) {
       violation = !human_steering;
     }
 
-    if (tesla_lateral_allowed && steer_angle_cmd_checks(desired_angle, steer_control_enabled, TESLA_STEERING_LIMITS)) {
-      violation = true;
+    if (tesla_lateral_allowed) {
+      // Tesla longitudinal permission is cleared by a brake press, but our
+      // independent lateral latch remains active. The shared angle checker uses
+      // controls_allowed internally, so temporarily give it the lateral permission
+      // while validating this steering frame.
+      bool controls_allowed_saved = controls_allowed;
+      controls_allowed = tesla_lateral_allowed;
+
+      bool steer_violation = steer_angle_cmd_checks(
+        desired_angle,
+        steer_control_enabled,
+        TESLA_STEERING_LIMITS
+      );
+
+      controls_allowed = controls_allowed_saved;
+
+      if (steer_violation) {
+        violation = true;
+      }
     }
   }
 
