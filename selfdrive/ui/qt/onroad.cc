@@ -627,7 +627,7 @@ void AnnotatedCameraWidget::drawTeslaStatusBar(QPainter &painter, const UIState 
 
   // Upper left, immediately to the right of the MAX-speed box.
   const int start_x = 20;
-  const int start_y = s->fb_h - box_height - 20;
+  const int start_y = height() - box_height - 20;
   const int box_width = 105;
   const int box_height = 58;
   const int spacing = 10;
