@@ -626,12 +626,14 @@ void AnnotatedCameraWidget::drawTeslaStatusBar(QPainter &painter, const UIState 
   painter.setRenderHint(QPainter::TextAntialiasing);
 
   // Upper left, immediately to the right of the MAX-speed box.
-  const int start_x = 20;
-  const int start_y = height() - box_height - 20;
+  
   const int box_width = 105;
   const int box_height = 58;
   const int spacing = 10;
   const int radius = 14;
+
+  const int start_x = 20;
+  const int start_y = this->height() - box_height - 20;
 
   painter.setFont(InterFont(32, QFont::Bold));
 
