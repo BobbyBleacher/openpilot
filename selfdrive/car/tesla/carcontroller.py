@@ -142,7 +142,11 @@ class CarController:
       # Keep Tesla lateral control available after TACC is cancelled by a brake
       # press. Driver steering torque is still handled by Panda angle limits and
       # the normal Openpilot steering-override events.
-      steer_enabled = CC.latActive and not CS.out.cruiseState.standstill
+      steer_enabled = (
+        CC.latActive
+        and not CS.human_control
+        and not CS.out.cruiseState.standstill
+      )
 
       if steer_enabled:
         # Angular rate limit based on speed
