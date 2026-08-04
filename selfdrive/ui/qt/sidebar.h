@@ -4,6 +4,8 @@
 
 #include <QFrame>
 #include <QMap>
+#include <QElapsedTimer>
+#include <QString>
 
 #include "selfdrive/ui/ui.h"
 
@@ -56,6 +58,10 @@ protected:
   ItemStatus connect_status, panda_status, temp_status;
   QString net_type;
   int net_strength = 0;
+
+  QString wifi_ssid = "--";
+  QString wifi_ip = "--";
+  QElapsedTimer wifi_refresh_timer;
 
 private:
   std::unique_ptr<PubMaster> pm;

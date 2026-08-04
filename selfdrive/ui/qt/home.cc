@@ -4,6 +4,7 @@
 #include <QMouseEvent>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include <QPixmap>
 
 #include "selfdrive/ui/qt/offroad/experimental_mode.h"
 #include "selfdrive/ui/qt/util.h"
@@ -162,21 +163,36 @@ OffroadHome::OffroadHome(QWidget* parent) : QFrame(parent) {
 
     home_layout->addWidget(left_widget, 1);
 
-    // right: ExperimentalModeButton, SetupWidget
-    QWidget* right_widget = new QWidget(this);
-    QVBoxLayout* right_column = new QVBoxLayout(right_widget);
-    right_column->setContentsMargins(0, 0, 0, 0);
+    // right: custom image and Wi-Fi information panel
+    QFrame *right_widget = new QFrame(this);
     right_widget->setFixedWidth(750);
-    right_column->setSpacing(30);
+    right_widget->setObjectName("customHomePanel");
 
-    ExperimentalModeButton *experimental_mode = new ExperimentalModeButton(this);
-    QObject::connect(experimental_mode, &ExperimentalModeButton::openSettings, this, &OffroadHome::openSettings);
-    right_column->addWidget(experimental_mode, 1);
+    QVBoxLayout *right_column = new QVBoxLayout(right_widget);
+    right_column->setContentsMargins(24, 24, 24, 24);
+    right_column->setSpacing(18);
 
-    SetupWidget *setup_widget = new SetupWidget;
-    QObject::connect(setup_widget, &SetupWidget::openSettings, this, &OffroadHome::openSettings);
-    right_column->addWidget(setup_widget, 1);
+    // Picture
+    QLabel *home_picture = new QLabel(right_widget);
+    home_picture->setAlignment(Qt::AlignCenter);
+    home_picture->setMinimumHeight(430);
+    home_picture->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    QPixmap picture("/data/openpilot/selfdrive/car/tesla/tinkla/bg.jpg");
+    if (!picture.isNull()) {
+      home_picture->setPixmap(
+        picture.scaled(
+          700,
+          430,
+          Qt::KeepAspectRatio,
+          Qt::SmoothTransformation
+        )
+      );
+    } else {
+      home_picture->setText(tr("Image unavailable"));
+    }
+
+    right_column->addWidget(home_picture, 1);
     home_layout->addWidget(right_widget, 1);
   }
   center_layout->addWidget(home_widget);
@@ -210,6 +226,10 @@ OffroadHome::OffroadHome(QWidget* parent) : QFrame(parent) {
     }
     OffroadHome > QLabel {
       font-size: 55px;
+    }
+    QFrame#customHomePanel {
+      background-color: #292929;
+      border-radius: 10px;
     }
   )");
 }

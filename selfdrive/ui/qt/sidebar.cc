@@ -1,6 +1,8 @@
 #include "selfdrive/ui/qt/sidebar.h"
 
 #include <QMouseEvent>
+#include <QNetworkInterface>
+#include <QProcess>
 
 #include "selfdrive/ui/qt/util.h"
 
@@ -34,6 +36,8 @@ Sidebar::Sidebar(QWidget *parent) : QFrame(parent), onroad(false), flag_pressed(
   setAttribute(Qt::WA_OpaquePaintEvent);
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
   setFixedWidth(300);
+
+  wifi_refresh_timer.start();
 
   QObject::connect(uiState(), &UIState::uiUpdate, this, &Sidebar::updateState);
 
@@ -79,6 +83,78 @@ void Sidebar::updateState(const UIState &s) {
   int strength = (int)deviceState.getNetworkStrength();
   setProperty("netStrength", strength > 0 ? strength + 1 : 0);
 
+  // Refresh detailed network information every five seconds.
+  if (!wifi_refresh_timer.isValid() || wifi_refresh_timer.elapsed() >= 5000) {
+    wifi_refresh_timer.restart();
+
+    wifi_ssid = "--";
+    wifi_ip = "--";
+
+    // Read the currently active Wi-Fi SSID through NetworkManager.
+    QProcess wifi_process;
+    wifi_process.start(
+      "nmcli",
+      {
+        "-t",
+        "-f",
+        "ACTIVE,SSID",
+        "dev",
+        "wifi"
+      }
+    );
+
+    if (wifi_process.waitForFinished(1000)) {
+      const QString output =
+        QString::fromUtf8(wifi_process.readAllStandardOutput());
+
+      const QStringList lines = output.split('\n', Qt::SkipEmptyParts);
+
+      for (const QString &line : lines) {
+        if (line.startsWith("yes:")) {
+          wifi_ssid = line.mid(4).trimmed();
+
+          if (wifi_ssid.isEmpty()) {
+            wifi_ssid = "--";
+          }
+
+          break;
+        }
+      }
+    }
+
+    // Find the first active, non-loopback IPv4 address.
+    const QList<QNetworkInterface> interfaces =
+      QNetworkInterface::allInterfaces();
+
+    for (const QNetworkInterface &interface : interfaces) {
+      const bool active =
+        interface.flags().testFlag(QNetworkInterface::IsUp) &&
+        interface.flags().testFlag(QNetworkInterface::IsRunning) &&
+        !interface.flags().testFlag(QNetworkInterface::IsLoopBack);
+
+      if (!active) {
+        continue;
+      }
+
+      for (const QNetworkAddressEntry &entry :
+          interface.addressEntries()) {
+        if (
+          entry.ip().protocol() ==
+          QAbstractSocket::IPv4Protocol
+        ) {
+          wifi_ip = entry.ip().toString();
+          break;
+        }
+      }
+
+      if (wifi_ip != "--") {
+        break;
+      }
+    }
+
+    update();
+  }
+
   ItemStatus connectStatus;
   auto last_ping = deviceState.getLastAthenaPingTime();
   if (last_ping == 0) {
@@ -119,7 +195,9 @@ void Sidebar::paintEvent(QPaintEvent *event) {
   p.setOpacity(settings_pressed ? 0.65 : 1.0);
   p.drawPixmap(settings_btn.x(), settings_btn.y(), settings_img);
   p.setOpacity(onroad && flag_pressed ? 0.65 : 1.0);
-  p.drawPixmap(home_btn.x(), home_btn.y(), onroad ? flag_img : home_img);
+  if (onroad) {
+    p.drawPixmap(home_btn.x(), home_btn.y(), flag_img);
+  }
   p.setOpacity(1.0);
 
   // network
@@ -140,4 +218,57 @@ void Sidebar::paintEvent(QPaintEvent *event) {
   drawMetric(p, temp_status.first, temp_status.second, 338);
   drawMetric(p, panda_status.first, panda_status.second, 496);
   drawMetric(p, connect_status.first, connect_status.second, 654);
+
+  // Detailed Wi-Fi information in the former home-logo area.
+  if (!onroad) {
+    const QRect wifi_rect(20, 835, 260, 205);
+
+    p.setPen(QPen(QColor(255, 255, 255, 85), 2));
+    p.setBrush(QColor(35, 35, 35, 180));
+    p.drawRoundedRect(wifi_rect, 20, 20);
+
+    p.setPen(Qt::white);
+    p.setFont(InterFont(28, QFont::DemiBold));
+    p.drawText(
+      QRect(30, 850, 240, 38),
+      Qt::AlignCenter,
+      tr("WI-FI")
+    );
+
+    p.setFont(InterFont(24, QFont::DemiBold));
+
+    // Elide very long SSIDs so they fit the sidebar.
+    const QString shown_ssid =
+      p.fontMetrics().elidedText(
+        wifi_ssid,
+        Qt::ElideRight,
+        220
+      );
+
+    p.drawText(
+      QRect(30, 892, 240, 40),
+      Qt::AlignCenter,
+      shown_ssid
+    );
+
+    p.setFont(InterFont(22));
+    p.setPen(QColor(255, 255, 255, 190));
+
+    p.drawText(
+      QRect(30, 934, 240, 36),
+      Qt::AlignCenter,
+      wifi_ip
+    );
+
+    const QString signal_text =
+      net_type == "Wi-Fi"
+        ? tr("Signal %1/5").arg(net_strength)
+        : tr("Not connected");
+
+    p.drawText(
+      QRect(30, 974, 240, 36),
+      Qt::AlignCenter,
+      signal_text
+    );
+  }
 }
