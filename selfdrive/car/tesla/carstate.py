@@ -17,10 +17,13 @@ class CarState(CarStateBase):
   def __init__(self, CP):
     super().__init__(CP)
     self.CP = CP
-    self.button_states = {button.event_type: False for button in BUTTONS}
-    self.can_define = CANDefine(DBC[CP.carFingerprint]['chassis'])
+
+    self.frame = 0
     self.params = Params()
     self.experimental_mode = False
+
+    self.button_states = {button.event_type: False for button in BUTTONS}
+    self.can_define = CANDefine(DBC[CP.carFingerprint]['chassis'])
 
     self.hands_on_level = 0
     self.steer_warning = None
@@ -546,7 +549,7 @@ class CarState(CarStateBase):
           self.DAS_216_driverOverriding = 0
         ret.cruiseState.speed = self.acc_speed_kph * CV.KPH_TO_MS
         
-    
+    self.frame += 1
     return ret
 
   @staticmethod
