@@ -6,6 +6,7 @@ from openpilot.selfdrive.car.interfaces import CarStateBase
 from opendbc.can.parser import CANParser
 from opendbc.can.can_define import CANDefine
 from openpilot.common.conversions import Conversions as CV
+from openpilot.common.params import Params
 from openpilot.selfdrive.car.modules.CFG_module import load_bool_param,load_float_param, load_str_param
 from openpilot.selfdrive.car.tesla.tunes import transform_pedal_to_di,PEDAL_DI_PRESSED
 
