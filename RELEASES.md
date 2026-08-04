@@ -1,3 +1,7 @@
+Version 0.9.6-beta71 (2026-08-03)
+========================
+* Restore OP Long in experimental mode
+
 Version 0.9.6-beta71 (2026-07-29)
 ========================
 * Keep OP engaged after brake press

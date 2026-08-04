@@ -56,6 +56,7 @@ class CarController:
     self.tesla_can = TeslaCAN(self.packer, self.pt_packer)
     self.prev_das_steeringControl_counter = -1
     self.long_control_counter = 0
+    self.experimental_mode = False
     self.params = Params()
 
     #initialize modules
@@ -84,6 +85,7 @@ class CarController:
     
     if self.frame % 100 == 0:
       CS.autoresumeAcc = load_bool_param("TinklaAutoResumeACC",False)
+      self.experimental_mode = self.params.get_bool("ExperimentalMode")
 
     can_sends = []
     #add 0.6s second delay logic to wait for AP which has a status at 2Hz
@@ -93,7 +95,10 @@ class CarController:
       # Autopilot/Autosteer becomes active.
       tesla_cruise_active = CS.tesla_acc_enabled
 
-      CS.enableACC = tesla_cruise_active
+      # Chill mode: Tesla handles longitudinal.
+      # Experimental mode: Openpilot handles longitudinal so model-based
+      # stopping for lights and stop signs remains available.
+      CS.enableACC = tesla_cruise_active and not self.experimental_mode
 
       if CS.cruiseEnabled:
         if not self.prevCruiseEnabled:

@@ -18,6 +18,8 @@ class CarState(CarStateBase):
     self.CP = CP
     self.button_states = {button.event_type: False for button in BUTTONS}
     self.can_define = CANDefine(DBC[CP.carFingerprint]['chassis'])
+    self.params = Params()
+    self.experimental_mode = False
 
     self.hands_on_level = 0
     self.steer_warning = None
@@ -204,6 +206,9 @@ class CarState(CarStateBase):
   def update(self, cp, cp_cam):
     ret = car.CarState.new_message()
 
+    if self.frame % 100 == 0:
+      self.experimental_mode = self.params.get_bool("ExperimentalMode")
+
     # Vehicle speed
     ret.vEgoRaw = cp.vl["ESP_B"]["ESP_vehicleSpeed"] * CV.KPH_TO_MS
     #ret.vEgoRaw = cp.vl["DI_torque2"]["DI_vehicleSpeed"] * CV.MPH_TO_MS
@@ -303,7 +308,7 @@ class CarState(CarStateBase):
       self.autopilot_enabled = (autopilot_status in ["ACTIVE_1", "ACTIVE_2"]) #, "ACTIVE_NAVIGATE_ON_AUTOPILOT"])
       # UI Mode Indicators
       ret.teslaAutopilotActive = self.autopilot_enabled
-      ret.teslaAccActive = acc_enabled
+      ret.teslaAccActive = acc_enabled and not self.experimental_mode
       cruiseEnabled = acc_enabled and not self.autopilot_enabled and not summon_or_autopark_enabled
 
       if self.autopilot_enabled:
