@@ -1,4 +1,4 @@
-Version 0.9.6-beta71 (2026-08-03)
+Version 0.9.6-beta74 (2026-08-03)
 ========================
 * Restore OP Long in experimental mode
 
