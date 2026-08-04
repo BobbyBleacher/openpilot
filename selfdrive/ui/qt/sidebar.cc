@@ -107,7 +107,7 @@ void Sidebar::updateState(const UIState &s) {
       const QString output =
         QString::fromUtf8(wifi_process.readAllStandardOutput());
 
-      const QStringList lines = output.split('\n', Qt::SkipEmptyParts);
+      const QStringList lines = output.split('\n', QString::SkipEmptyParts);
 
       for (const QString &line : lines) {
         if (line.startsWith("yes:")) {
