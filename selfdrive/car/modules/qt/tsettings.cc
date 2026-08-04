@@ -61,7 +61,7 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
     },
     {"TinklaExpModelAutoswitch",
       "Experimental Mode Autoswitch",
-      "Automatically switches between Chill Mode and Experiemtnal Mode. Experimental Mode will only be used below set m/s speed and when not following another car.",
+      "Automatically switches between Chill Mode and Experimental Mode. Experimental Mode will only be used below set m/s speed and when not following another car.",
       "../assets/offroad/icon_warning.png",
       "","","",0.0,0.0,0.0,0.0, TINKLA_TOGGLE
       },
