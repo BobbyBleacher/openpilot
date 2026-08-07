@@ -65,6 +65,22 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     }
   )");
   setAttribute(Qt::WA_NoSystemBackground);
+  
+  // Optional remote UI capture for development.
+  // Enable with: touch /data/ui_capture_enabled
+  QTimer *capture_timer = new QTimer(this);
+
+  QObject::connect(capture_timer, &QTimer::timeout, [=]() {
+    if (QFile::exists("/data/ui_capture_enabled")) {
+      this->grab().save(
+        "/data/ui_capture.jpg",
+        "JPG",
+        80
+      );
+    }
+  });
+
+  capture_timer->start(1000);
 }
 
 void MainWindow::openSettings(int index, const QString &param) {
@@ -101,20 +117,4 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
       break;
   }
   return ignore;
-
-  // Optional remote UI capture for development.
-  // Enable with: touch /data/ui_capture_enabled
-  QTimer *capture_timer = new QTimer(this);
-
-  QObject::connect(capture_timer, &QTimer::timeout, [=]() {
-    if (QFile::exists("/data/ui_capture_enabled")) {
-      this->grab().save(
-        "/data/ui_capture.jpg",
-        "JPG",
-        80
-      );
-    }
-  });
-
-  capture_timer->start(1000);
 }
