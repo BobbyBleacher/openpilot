@@ -177,7 +177,6 @@ OffroadHome::OffroadHome(QWidget* parent) : QFrame(parent) {
           Qt::SmoothTransformation
         )
       );
-    }
     } else {
       home_picture->setText(tr("Image unavailable"));
     }
