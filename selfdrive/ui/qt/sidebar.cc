@@ -223,18 +223,18 @@ void Sidebar::paintEvent(QPaintEvent *event) {
   if (!onroad) {
     p.setPen(Qt::white);
 
-    p.setFont(InterFont(28, QFont::DemiBold));
-    p.drawText(QRect(20, 850, 260, 40),
+    p.setFont(InterFont(36, QFont::DemiBold));
+    p.drawText(QRect(20, 840, 260, 48),
               Qt::AlignCenter,
               wifi_ssid);
 
-    p.setFont(InterFont(22));
-    p.setPen(QColor(255, 255, 255, 190));
-    p.drawText(QRect(20, 895, 260, 32),
+    p.setFont(InterFont(30));
+    p.setPen(QColor(255, 255, 255, 210));
+    p.drawText(QRect(20, 895, 260, 38),
               Qt::AlignCenter,
               wifi_ip);
 
-    p.drawText(QRect(20, 932, 260, 32),
+    p.drawText(QRect(20, 940, 260, 38),
               Qt::AlignCenter,
               tr("Wi-Fi %1/5").arg(net_strength));
   }
