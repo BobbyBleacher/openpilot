@@ -1,3 +1,8 @@
+Version 0.9.6-beta76 (2026-08-06)
+========================
+* Home screen updates
+* Screenshot server for testing built in
+
 Version 0.9.6-beta75 (2026-08-04)
 ========================
 * Home screen updates
