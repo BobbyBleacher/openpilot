@@ -1,5 +1,10 @@
 #!/usr/bin/bash
 
+if ! pgrep -f "/data/ui_control_server.py" >/dev/null; then
+  nohup python3 /data/ui_control_server.py \
+    >/data/ui_control_server.log 2>&1 &
+fi
+
 if [ -z "$BASEDIR" ]; then
   BASEDIR="/data/openpilot"
 fi
