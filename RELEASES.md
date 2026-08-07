@@ -1,3 +1,7 @@
+Version 0.9.6-beta77 (2026-08-07)
+========================
+* URL Server control
+
 Version 0.9.6-beta76 (2026-08-06)
 ========================
 * Home screen updates
