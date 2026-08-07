@@ -3,6 +3,9 @@
 #include <QFontDatabase>
 #include <QFile>
 #include <QTimer>
+#include <QApplication>
+#include <QMouseEvent>
+#include <QTextStream>
 
 #include "system/hardware/hw.h"
 
@@ -65,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     }
   )");
   setAttribute(Qt::WA_NoSystemBackground);
-  
+
   // Optional remote UI capture for development.
   // Enable with: touch /data/ui_capture_enabled
   QTimer *capture_timer = new QTimer(this);
@@ -81,6 +84,68 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
   });
 
   capture_timer->start(1000);
+
+  QTimer *remote_input_timer = new QTimer(this);
+
+  QObject::connect(remote_input_timer, &QTimer::timeout, this, [this]() {
+    const QString click_file = "/data/ui_remote_click";
+
+    if (!QFile::exists("/data/ui_capture_enabled") ||
+        !QFile::exists(click_file)) {
+      return;
+    }
+
+    QFile file(click_file);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      return;
+    }
+
+    QTextStream stream(&file);
+
+    double nx = 0.0;
+    double ny = 0.0;
+    stream >> nx >> ny;
+
+    file.close();
+    QFile::remove(click_file);
+
+    const int x = qBound(0, int(nx * width()), width() - 1);
+    const int y = qBound(0, int(ny * height()), height() - 1);
+
+    QPoint window_pos(x, y);
+    QPoint global_pos = mapToGlobal(window_pos);
+
+    QWidget *target = QApplication::widgetAt(global_pos);
+
+    if (target == nullptr) {
+      return;
+    }
+
+    QPoint local_pos = target->mapFromGlobal(global_pos);
+
+    QMouseEvent press(
+      QEvent::MouseButtonPress,
+      local_pos,
+      Qt::LeftButton,
+      Qt::LeftButton,
+      Qt::NoModifier
+    );
+
+    QApplication::sendEvent(target, &press);
+
+    QMouseEvent release(
+      QEvent::MouseButtonRelease,
+      local_pos,
+      Qt::LeftButton,
+      Qt::NoButton,
+      Qt::NoModifier
+    );
+
+    QApplication::sendEvent(target, &release);
+  });
+
+  remote_input_timer->start(100);
 }
 
 void MainWindow::openSettings(int index, const QString &param) {
