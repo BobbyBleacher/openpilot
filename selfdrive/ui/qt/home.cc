@@ -112,7 +112,7 @@ void HomeWindow::mouseDoubleClickEvent(QMouseEvent* e) {
 
 OffroadHome::OffroadHome(QWidget* parent) : QFrame(parent) {
   QVBoxLayout* main_layout = new QVBoxLayout(this);
-  main_layout->setContentsMargins(40, 40, 40, 40);
+  main_layout->setContentsMargins(20, 20, 20, 20);
 
   // top header
   QHBoxLayout* header_layout = new QHBoxLayout();
@@ -137,7 +137,7 @@ OffroadHome::OffroadHome(QWidget* parent) : QFrame(parent) {
   main_layout->addLayout(header_layout);
 
   // main content
-  main_layout->addSpacing(25);
+  main_layout->addSpacing(10);
   center_layout = new QStackedLayout();
 
   QWidget *home_widget = new QWidget(this);
@@ -146,54 +146,44 @@ OffroadHome::OffroadHome(QWidget* parent) : QFrame(parent) {
     home_layout->setContentsMargins(0, 0, 0, 0);
     home_layout->setSpacing(30);
 
-    // left: MapSettings/PrimeAdWidget
-    QStackedWidget *left_widget = new QStackedWidget(this);
-#ifdef ENABLE_MAPS
-    left_widget->addWidget(new MapSettings);
-#else
-    left_widget->addWidget(new QWidget);
-#endif
-    left_widget->addWidget(new PrimeAdWidget);
-    left_widget->setStyleSheet("border-radius: 10px;");
+    // full-width home image
+    QFrame *image_widget = new QFrame(this);
+    image_widget->setObjectName("customHomePanel");
 
-    left_widget->setCurrentIndex(uiState()->hasPrime() ? 0 : 1);
-    connect(uiState(), &UIState::primeChanged, [=](bool prime) {
-      left_widget->setCurrentIndex(prime ? 0 : 1);
-    });
+    QVBoxLayout *image_layout = new QVBoxLayout(image_widget);
+    image_layout->setContentsMargins(0, 0, 0, 0);
+    image_layout->setSpacing(0);
 
-    home_layout->addWidget(left_widget, 1);
-
-    // right: custom image and Wi-Fi information panel
-    QFrame *right_widget = new QFrame(this);
-    right_widget->setFixedWidth(750);
-    right_widget->setObjectName("customHomePanel");
-
-    QVBoxLayout *right_column = new QVBoxLayout(right_widget);
-    right_column->setContentsMargins(24, 24, 24, 24);
-    right_column->setSpacing(18);
-
-    // Picture
-    QLabel *home_picture = new QLabel(right_widget);
+    QLabel *home_picture = new QLabel(image_widget);
     home_picture->setAlignment(Qt::AlignCenter);
-    home_picture->setMinimumHeight(430);
     home_picture->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QPixmap picture("/data/openpilot/selfdrive/car/tesla/tinkla/bg.jpg");
+
     if (!picture.isNull()) {
+      QTransform transform;
+      transform.rotate(-90);
+
+      picture = picture.transformed(
+        transform,
+        Qt::SmoothTransformation
+      );
+
       home_picture->setPixmap(
         picture.scaled(
-          700,
-          430,
-          Qt::KeepAspectRatio,
+          1600,
+          900,
+          Qt::KeepAspectRatioByExpanding,
           Qt::SmoothTransformation
         )
       );
+    }
     } else {
       home_picture->setText(tr("Image unavailable"));
     }
 
-    right_column->addWidget(home_picture, 1);
-    home_layout->addWidget(right_widget, 1);
+    image_layout->addWidget(home_picture);
+    home_layout->addWidget(image_widget, 1);
   }
   center_layout->addWidget(home_widget);
 

@@ -221,54 +221,21 @@ void Sidebar::paintEvent(QPaintEvent *event) {
 
   // Detailed Wi-Fi information in the former home-logo area.
   if (!onroad) {
-    const QRect wifi_rect(20, 835, 260, 205);
-
-    p.setPen(QPen(QColor(255, 255, 255, 85), 2));
-    p.setBrush(QColor(35, 35, 35, 180));
-    p.drawRoundedRect(wifi_rect, 20, 20);
-
     p.setPen(Qt::white);
+
     p.setFont(InterFont(28, QFont::DemiBold));
-    p.drawText(
-      QRect(30, 850, 240, 38),
-      Qt::AlignCenter,
-      tr("WI-FI")
-    );
-
-    p.setFont(InterFont(24, QFont::DemiBold));
-
-    // Elide very long SSIDs so they fit the sidebar.
-    const QString shown_ssid =
-      p.fontMetrics().elidedText(
-        wifi_ssid,
-        Qt::ElideRight,
-        220
-      );
-
-    p.drawText(
-      QRect(30, 892, 240, 40),
-      Qt::AlignCenter,
-      shown_ssid
-    );
+    p.drawText(QRect(20, 850, 260, 40),
+              Qt::AlignCenter,
+              wifi_ssid);
 
     p.setFont(InterFont(22));
     p.setPen(QColor(255, 255, 255, 190));
+    p.drawText(QRect(20, 895, 260, 32),
+              Qt::AlignCenter,
+              wifi_ip);
 
-    p.drawText(
-      QRect(30, 934, 240, 36),
-      Qt::AlignCenter,
-      wifi_ip
-    );
-
-    const QString signal_text =
-      net_type == "Wi-Fi"
-        ? tr("Signal %1/5").arg(net_strength)
-        : tr("Not connected");
-
-    p.drawText(
-      QRect(30, 974, 240, 36),
-      Qt::AlignCenter,
-      signal_text
-    );
+    p.drawText(QRect(20, 932, 260, 32),
+              Qt::AlignCenter,
+              tr("Wi-Fi %1/5").arg(net_strength));
   }
 }
