@@ -122,33 +122,18 @@ void Sidebar::updateState(const UIState &s) {
       }
     }
 
-    // Find the first active, non-loopback IPv4 address.
-    const QList<QNetworkInterface> interfaces =
-      QNetworkInterface::allInterfaces();
+    // Get the IPv4 address specifically from the Wi-Fi interface.
+    QNetworkInterface wifi_interface =
+      QNetworkInterface::interfaceFromName("wlan0");
 
-    for (const QNetworkInterface &interface : interfaces) {
-      const bool active =
-        interface.flags().testFlag(QNetworkInterface::IsUp) &&
-        interface.flags().testFlag(QNetworkInterface::IsRunning) &&
-        !interface.flags().testFlag(QNetworkInterface::IsLoopBack);
-
-      if (!active) {
-        continue;
-      }
-
+    if (wifi_interface.isValid()) {
       for (const QNetworkAddressEntry &entry :
-          interface.addressEntries()) {
-        if (
-          entry.ip().protocol() ==
-          QAbstractSocket::IPv4Protocol
-        ) {
+          wifi_interface.addressEntries()) {
+        if (entry.ip().protocol() ==
+            QAbstractSocket::IPv4Protocol) {
           wifi_ip = entry.ip().toString();
           break;
         }
-      }
-
-      if (wifi_ip != "--") {
-        break;
       }
     }
 
