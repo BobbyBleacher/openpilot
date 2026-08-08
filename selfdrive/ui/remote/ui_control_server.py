@@ -12,7 +12,7 @@ REMOTE_SCRIPT = os.path.join(SCRIPT_DIR, "ui_remote.sh")
 
 def run_remote(command):
   return subprocess.run(
-    [REMOTE_SCRIPT, command],
+    ["bash", REMOTE_SCRIPT, command],
     capture_output=True,
     text=True,
   )
