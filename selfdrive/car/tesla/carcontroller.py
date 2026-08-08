@@ -88,7 +88,7 @@ class CarController:
       self.experimental_mode = self.params.get_bool("ExperimentalMode")
 
     can_sends = []
-    #add 0.6s second delay logic to wait for AP which has a status at 2Hz
+    #add 0.3s second delay logic to wait for AP which has a status at 2Hz
     if self.CP.carFingerprint != CAR.PREAP_MODELS and not CS.autopilot_disabled:
       # Use Tesla longitudinal whenever the vehicle's real cruise system
       # is active. OP remains responsible for lateral unless stock
@@ -104,7 +104,7 @@ class CarController:
         if not self.prevCruiseEnabled:
           self.cruiseDelayFrame = self.frame
 
-        if self.frame - self.cruiseDelayFrame >= 100:
+        if self.frame - self.cruiseDelayFrame >= 30:
           CS.cruiseDelay = True
       else:
         self.cruiseDelayFrame = 0

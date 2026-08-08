@@ -1,3 +1,8 @@
+Version 0.9.6-beta78 (2026-08-07)
+========================
+* Change OP delay to 0.3s
+* Small UI tweaks
+
 Version 0.9.6-beta77 (2026-08-07)
 ========================
 * URL Server control
