@@ -78,7 +78,7 @@ while True:
   sm.update(1000)
 
   if sm.alive["deviceState"] and sm["deviceState"].started:
-    subprocess.Popen([remote_script, "stop"])
+    subprocess.Popen(["bash", remote_script, "stop"])
     break
 
   time.sleep(1)
