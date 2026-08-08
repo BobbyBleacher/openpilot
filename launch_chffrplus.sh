@@ -1,8 +1,9 @@
 #!/usr/bin/bash
 
-if ! pgrep -f "/data/ui_control_server.py" >/dev/null; then
-  nohup python3 /data/ui_control_server.py \
-    >/data/ui_control_server.log 2>&1 &
+if ! pgrep -f "selfdrive/ui/remote/ui_control_server.py" >/dev/null; then
+  nohup /usr/local/pyenv/versions/3.11.4/bin/python3 \
+    /data/openpilot/selfdrive/ui/remote/ui_control_server.py \
+    >> /data/ui_control_server.log 2>&1 &
 fi
 
 if [ -z "$BASEDIR" ]; then
