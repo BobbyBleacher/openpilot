@@ -1,36 +1,102 @@
 #!/usr/bin/env python3
 
-import json
 import os
-from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+import subprocess
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-os.chdir("/data")
+PORT = 8081
 
-class Handler(SimpleHTTPRequestHandler):
-  def do_POST(self):
-    if self.path != "/click":
-      self.send_error(404)
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REMOTE_SCRIPT = os.path.join(SCRIPT_DIR, "ui_remote.sh")
+
+
+def run_remote(command):
+  return subprocess.run(
+    [REMOTE_SCRIPT, command],
+    capture_output=True,
+    text=True,
+  )
+
+
+class Handler(BaseHTTPRequestHandler):
+  def do_GET(self):
+    host = self.headers.get("Host", "localhost").split(":")[0]
+
+    if self.path == "/start":
+      result = run_remote("start")
+
+      if result.returncode != 0:
+        self.send_response(500)
+        self.send_header("Content-Type", "text/plain")
+        self.end_headers()
+        self.wfile.write((result.stdout + result.stderr).encode())
+        return
+
+      self.send_response(302)
+      self.send_header("Location", f"http://{host}:8080/ui.html")
+      self.end_headers()
       return
 
-    try:
-      length = int(self.headers.get("Content-Length", "0"))
-      data = json.loads(self.rfile.read(length))
+    if self.path == "/stop":
+      result = run_remote("stop")
 
-      x = max(0.0, min(1.0, float(data["x"])))
-      y = max(0.0, min(1.0, float(data["y"])))
-
-      tmp = "/data/ui_remote_click.tmp"
-      final = "/data/ui_remote_click"
-
-      with open(tmp, "w") as f:
-        f.write(f"{x:.6f} {y:.6f}\n")
-
-      os.replace(tmp, final)
-
-      self.send_response(204)
+      self.send_response(200 if result.returncode == 0 else 500)
+      self.send_header("Content-Type", "text/plain")
       self.end_headers()
+      self.wfile.write((result.stdout + result.stderr).encode())
+      return
 
-    except Exception as e:
-      self.send_error(400, str(e))
+    if self.path == "/status":
+      result = run_remote("status")
 
-ThreadingHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
+      self.send_response(200 if result.returncode == 0 else 500)
+      self.send_header("Content-Type", "text/plain")
+      self.end_headers()
+      self.wfile.write((result.stdout + result.stderr).encode())
+      return
+
+    self.send_response(200)
+    self.send_header("Content-Type", "text/html")
+    self.end_headers()
+
+    self.wfile.write(b"""
+<!doctype html>
+<html>
+<head>
+  <title>Comma Remote UI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+
+    a {
+      display: inline-block;
+      margin: 20px;
+      padding: 25px 45px;
+      background: #333;
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-size: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Comma Remote UI</h1>
+  <a href="/start">Start</a>
+  <a href="/stop">Stop</a>
+  <a href="/status">Status</a>
+</body>
+</html>
+""")
+
+  def log_message(self, format, *args):
+    pass
+
+
+ThreadingHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()

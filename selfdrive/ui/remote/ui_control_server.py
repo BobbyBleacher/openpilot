@@ -2,7 +2,10 @@
 
 import subprocess
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import os
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REMOTE_SCRIPT = os.path.join(SCRIPT_DIR, "ui_remote.sh")
 
 PORT = 8081
 
