@@ -33,6 +33,8 @@ start() {
   if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
     echo "Remote UI already running (PID $(cat "$PIDFILE"))"
   else
+    pkill -f "$SCRIPT_DIR/ui_server.py" 2>/dev/null || true
+    pkill -f 'http.server 8080' 2>/dev/null || true
     nohup python3 "$SCRIPT_DIR/ui_server.py" \
       >"$LOGFILE" 2>&1 &
 
