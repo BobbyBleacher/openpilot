@@ -1,4 +1,5 @@
 import copy
+import time
 from collections import deque
 from cereal import car
 from openpilot.selfdrive.car.tesla.values import DBC, GEAR_MAP, DOORS, BUTTONS, CAR, CruiseButtons, CruiseState, WHEEL_RADIUS
@@ -40,6 +41,7 @@ class CarState(CarStateBase):
     self.autopilot_enabled = False
     self.cruiseEnabled = False
     self.cruiseDelay = False
+    self.ap_arm_until = 0.0
     self.carNotInDrive = True
     self.autopilot_was_enabled = False
     self.tesla_acc_enabled = False
@@ -330,9 +332,11 @@ class CarState(CarStateBase):
       if self.autopilot_enabled or summon_or_autopark_enabled:
         self.cruiseEnabled = False
 
-      # Stalk cancel always disables Openpilot lateral.
+      # Stalk cancel always disables Openpilot lateral
+      # and opens a 1-second window for engaging stock Autopilot.
       if self.cruise_buttons == CruiseButtons.CANCEL:
         self.cruiseEnabled = False
+        self.ap_arm_until = time.monotonic() + 1.0
 
       ret.cruiseState.enabled = self.cruiseEnabled and self.cruiseDelay
       

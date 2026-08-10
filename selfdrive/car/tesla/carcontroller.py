@@ -100,16 +100,22 @@ class CarController:
       # stopping for lights and stop signs remains available.
       CS.enableACC = tesla_cruise_active and not self.experimental_mode
 
-      if CS.cruiseEnabled:
-        if not self.prevCruiseEnabled:
-          self.cruiseDelayFrame = self.frame
+      ap_armed = time.monotonic() < CS.ap_arm_until
 
-        if self.frame - self.cruiseDelayFrame >= 30:
+      if CS.cruiseEnabled:
+        if ap_armed:
+          # Give stock AP time to detect the double-pull.
+          if not self.prevCruiseEnabled:
+            self.cruiseDelayFrame = self.frame
+
+          if self.frame - self.cruiseDelayFrame >= 100:
+            CS.cruiseDelay = True
+        else:
+          # Normal OP engagement: no delay.
           CS.cruiseDelay = True
       else:
         self.cruiseDelayFrame = 0
         CS.cruiseDelay = False
-    self.prevCruiseEnabled = CS.cruiseEnabled
 
     #receive socks
     long_plan = messaging.recv_one_or_none(self.lP)
