@@ -665,6 +665,75 @@ void AnnotatedCameraWidget::drawTeslaStatusBar(QPainter &painter, const UIState 
   painter.restore();
 }
 
+void AnnotatedCameraWidget::drawRadarDebug(QPainter &painter, const UIState *s) {
+  SubMaster &sm = *(s->sm);
+  const auto radar_state = sm["radarState"].getRadarState();
+  const auto lead = radar_state.getLeadOne();
+
+  painter.save();
+  painter.setRenderHint(QPainter::Antialiasing);
+  painter.setRenderHint(QPainter::TextAntialiasing);
+
+  const int box_width = 330;
+  const int box_height = 160;
+  const int x = width() - box_width - 25;
+  const int y = 180;
+
+  QRect box(x, y, box_width, box_height);
+
+  painter.setBrush(QColor(0, 0, 0, 175));
+  painter.setPen(QPen(QColor(255, 255, 255, 100), 2));
+  painter.drawRoundedRect(box, 16, 16);
+
+  painter.setPen(Qt::white);
+
+  if (lead.getStatus()) {
+    const float d_rel = lead.getDRel();
+    const float y_rel = lead.getYRel();
+    const bool radar = lead.getRadar();
+    const int track_id = lead.getRadarTrackId();
+
+    painter.setFont(InterFont(30, QFont::Bold));
+    painter.drawText(
+      QRect(x + 15, y + 10, box_width - 30, 40),
+      Qt::AlignCenter,
+      radar ? "RADAR LEAD" : "VISION LEAD"
+    );
+
+    painter.setFont(InterFont(27, QFont::DemiBold));
+
+    painter.drawText(
+      QRect(x + 20, y + 58, box_width - 40, 34),
+      Qt::AlignLeft,
+      QString("Lat: %1 m").arg(y_rel, 0, 'f', 2)
+    );
+
+    painter.drawText(
+      QRect(x + 20, y + 96, box_width - 40, 34),
+      Qt::AlignLeft,
+      QString("Dist: %1 m").arg(d_rel, 0, 'f', 1)
+    );
+
+    painter.drawText(
+      QRect(x + 20, y + 134, box_width - 40, 34),
+      Qt::AlignLeft,
+      QString("Track: %1").arg(track_id)
+    );
+
+  } else {
+    painter.setFont(InterFont(32, QFont::Bold));
+    painter.setPen(QColor(255, 255, 255, 150));
+
+    painter.drawText(
+      box,
+      Qt::AlignCenter,
+      "NO LEAD"
+    );
+  }
+
+  painter.restore();
+}
+
 void AnnotatedCameraWidget::paintGL() {
   UIState *s = uiState();
   SubMaster &sm = *(s->sm);
@@ -749,6 +818,7 @@ void AnnotatedCameraWidget::paintGL() {
 
   drawHud(painter);
   drawTeslaStatusBar(painter, s);
+  drawRadarDebug(painter, s);
 
   double cur_draw_t = millis_since_boot();
   double dt = cur_draw_t - prev_draw_t;

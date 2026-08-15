@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import time
+
+from openpilot.common.swaglog import cloudlog
 from cereal import car
 from opendbc.can.parser import CANParser
 from openpilot.selfdrive.car.tesla.values import DBC, CAR, CAN_RADAR
@@ -45,6 +48,7 @@ class RadarInterface(RadarInterfaceBase):
     self.radar_offset = load_float_param("TinklaRadarOffset",0.0)
     self.ignoreRadarSGUError = load_bool_param("TinklaTeslaRadarIgnoreSGUError",False)
     self.radarUpsideDown = load_bool_param("TinklaUseTeslaRadarUpsideDown",False)
+    self.last_radar_debug_log = 0.0
 
   def update(self, can_strings):
     if self.rcp is None or self.radar_off_can:
@@ -128,6 +132,51 @@ class RadarInterface(RadarInterfaceBase):
         self.pts[i].yRel = - self.pts[i].yRel
         self.pts[i].yvRel = - self.pts[i].yvRel
       self.pts[i].measured = bool(msg_a['Meas'])
+
+    # Radar alignment diagnostic.
+    # Once per second log the closest valid tracked object.
+    now = time.monotonic()
+
+    if now - self.last_radar_debug_log >= 1.0:
+      valid_tracks = []
+
+      for i in range(NUM_POINTS):
+        msg_a = self.rcp.vl[RADAR_MSGS_A[i]]
+
+        if not msg_a['Tracked']:
+          continue
+
+        if (
+          msg_a["LongDist"] <= 0
+          or msg_a["LongDist"] > BOSCH_MAX_DIST
+          or msg_a["ProbExist"] < OBJECT_MIN_PROBABILITY
+        ):
+          continue
+
+        valid_tracks.append((
+          msg_a["LongDist"],
+          msg_a["LatDist"],
+          msg_a["Index"],
+        ))
+
+      if valid_tracks:
+        d_rel, raw_lat, radar_index = min(valid_tracks, key=lambda x: x[0])
+
+        corrected_lat = raw_lat + self.radar_offset
+
+        if self.radarUpsideDown:
+          corrected_lat = -corrected_lat
+
+        cloudlog.warning(
+          f"RADAR_DEBUG "
+          f"index={radar_index} "
+          f"d={d_rel:.2f}m "
+          f"raw_lat={raw_lat:+.3f}m "
+          f"offset={self.radar_offset:+.3f}m "
+          f"corrected_lat={corrected_lat:+.3f}m"
+        )
+
+      self.last_radar_debug_log = now
 
     ret.points = list(self.pts.values())
     self.updated_messages.clear()

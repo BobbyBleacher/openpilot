@@ -107,6 +107,7 @@ protected:
   void drawHud(QPainter &p);
   void drawDriverState(QPainter &painter, const UIState *s);
   void drawTeslaStatusBar(QPainter &painter, const UIState *s);
+  void drawRadarDebug(QPainter &painter, const UIState *s);
   inline QColor redColor(int alpha = 255) { return QColor(201, 34, 49, alpha); }
   inline QColor whiteColor(int alpha = 255) { return QColor(255, 255, 255, alpha); }
   inline QColor blackColor(int alpha = 255) { return QColor(0, 0, 0, alpha); }
