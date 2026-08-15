@@ -674,10 +674,11 @@ void AnnotatedCameraWidget::drawRadarDebug(QPainter &painter, const UIState *s) 
   painter.setRenderHint(QPainter::Antialiasing);
   painter.setRenderHint(QPainter::TextAntialiasing);
 
-  const int box_width = 330;
-  const int box_height = 160;
+  const int box_width = 260;
+  const int box_height = 110;
+
   const int x = width() - box_width - 25;
-  const int y = 180;
+  const int y = height() - box_height - 25;
 
   QRect box(x, y, box_width, box_height);
 
