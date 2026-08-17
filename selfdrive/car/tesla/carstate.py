@@ -323,8 +323,14 @@ class CarState(CarStateBase):
       if not (self.autopilot_enabled or cruiseEnabled):
         self.autopilot_was_enabled = False
 
-      # Latch Openpilot lateral after TACC has engaged.
-      if cruiseEnabled and not self.autopilot_was_enabled:
+      main_pull = (
+        self.cruise_buttons == CruiseButtons.MAIN
+        and self.prev_cruise_buttons != CruiseButtons.MAIN
+      )
+
+      # A fresh stalk pull always enables OpenPilot lateral,
+      # regardless of whether Tesla ACC is available.
+      if main_pull and not self.autopilot_enabled:
         self.cruiseEnabled = True
 
       # Explicitly hand control back to Tesla when stock Autosteer,

@@ -911,31 +911,41 @@ static void tesla_rx_hook(CANPacket_t *to_push) {
         current_car_time = (hour * 3600) + (minute * 60) + second;
       }
 
-      if (addr == 0x45)  {
-        //first save for future use
+      if (addr == 0x45) {
+        // Save for future use
         DAS_lastStalkL = GET_BYTES_04(to_push);
         DAS_lastStalkH = GET_BYTES_48(to_push);
+
         // 6 bits starting at position 0
+        int ap_lever_position = GET_BYTE(to_push, 0) & 0x3F;
+
+        // AP1/AP2 car with stock AP enabled:
+        // allow OP lateral directly from the stalk, independent of Tesla ACC.
+        if (has_ap_hardware && !has_ap_disabled) {
+          if (ap_lever_position == 2) {
+            // Pull stalk: allow OpenPilot steering even if ACC is unavailable.
+            tesla_lateral_allowed = true;
+          }
+          else if (ap_lever_position == 1) {
+            // Cancel stalk: explicitly disable OpenPilot steering.
+            tesla_lateral_allowed = false;
+          }
+        }
+
+        // Existing behavior for PreAP or cars with stock AP disabled.
         if ((!has_ap_hardware) || (has_ap_hardware && has_ap_disabled)) {
-          int ap_lever_position = GET_BYTE(to_push, 0) & 0x3F;
-          if (ap_lever_position == 2)
-          { // pull forward
+          if (ap_lever_position == 2) {
             // activate openpilot
-            // TODO: uncomment the if to use double pull to activate
-            //if (current_car_time <= time_at_last_stalk_pull + 1 && current_car_time != -1 && time_at_last_stalk_pull != -1) {
             pcm_cruise_check(true);
-            //cruise_engaged_prev = true;
-            //}
             time_at_last_stalk_pull = current_car_time;
           }
-          else if (ap_lever_position == 1)
-          { // push towards the back
+          else if (ap_lever_position == 1) {
             // deactivate openpilot
             pcm_cruise_check(false);
             tesla_lateral_allowed = false;
-            //cruise_engaged_prev = false;
           }
-          //if using pedal, send a cancel immediately to cancel the CC
+
+          // if using pedal, send a cancel immediately to cancel the CC
           if ((pedalEnabled == 1) && (ap_lever_position > 1)) {
             do_fake_stalk_cancel();
           }
