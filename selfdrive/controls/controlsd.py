@@ -490,11 +490,19 @@ class Controls:
     tesla_lateral_only = self.CP.carName == "tesla" and CS.brakePressed
 
     if self.CP.carName == "tesla":
-      if self.enabled and CS.brakePressed:
+      #if self.enabled and CS.brakePressed:
+      if self.enabled and not CS.cruiseState.enabled:
+        # OP lateral-only mode. Panda controlsAllowed may legitimately be false.
         self.tesla_lateral_only = True
+        self.mismatch_counter = 0
 
-      if not self.enabled:
+      elif self.enabled and CS.cruiseState.enabled:
+        # Normal OP + Tesla ACC operation.
         self.tesla_lateral_only = False
+
+      else:
+        self.tesla_lateral_only = False
+        self.mismatch_counter = 0
 
     if self.enabled and not self.tesla_lateral_only and any(
         not ps.controlsAllowed for ps in self.sm['pandaStates']
