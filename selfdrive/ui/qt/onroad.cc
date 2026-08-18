@@ -675,10 +675,10 @@ void AnnotatedCameraWidget::drawRadarDebug(QPainter &painter, const UIState *s) 
   painter.setRenderHint(QPainter::TextAntialiasing);
 
   const int box_width = 260;
-  const int box_height = 110;
+  const int box_height = 175;
 
-  const int x = width() - box_width - 25;
-  const int y = height() - box_height - 25;
+  const int x = 20;
+  const int y = height() - box_height - 95;
 
   QRect box(x, y, box_width, box_height);
 
@@ -704,19 +704,19 @@ void AnnotatedCameraWidget::drawRadarDebug(QPainter &painter, const UIState *s) 
     painter.setFont(InterFont(27, QFont::DemiBold));
 
     painter.drawText(
-      QRect(x + 20, y + 58, box_width - 40, 34),
+      QRect(x + 20, y + 55, box_width - 40, 32),
       Qt::AlignLeft,
       QString("Lat: %1 m").arg(y_rel, 0, 'f', 2)
     );
 
     painter.drawText(
-      QRect(x + 20, y + 96, box_width - 40, 34),
+      QRect(x + 20, y + 91, box_width - 40, 32),
       Qt::AlignLeft,
       QString("Dist: %1 m").arg(d_rel, 0, 'f', 1)
     );
 
     painter.drawText(
-      QRect(x + 20, y + 134, box_width - 40, 34),
+      QRect(x + 20, y + 127, box_width - 40, 32),
       Qt::AlignLeft,
       QString("Track: %1").arg(track_id)
     );
