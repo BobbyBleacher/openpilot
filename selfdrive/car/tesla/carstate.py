@@ -350,7 +350,8 @@ class CarState(CarStateBase):
         ret.cruiseState.speed = cp.vl["DI_state"]["DI_cruiseSet"] * CV.KPH_TO_MS
       elif self.speed_units == "MPH":
         ret.cruiseState.speed = cp.vl["DI_state"]["DI_cruiseSet"] * CV.MPH_TO_MS
-      ret.cruiseState.available = ((cruise_state == "STANDBY") or acc_enabled)
+      # OpenPilot lateral is always available independently of Tesla ACC.
+      ret.cruiseState.available = True
       #if self.CP.openpilotLongitudinalControl:
       #  ret.cruiseState.available = True #(not ret.doorOpen) and (ret.gearShifter == car.CarState.GearShifter.drive) and (not ret.seatbeltUnlatched)
         #ret.cruiseState.available = ret.cruiseState.available and (not cruiseEnabled) and (not self.autopilot_enabled)
