@@ -119,12 +119,46 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
       "",
       2.0,1.0,3.0,1.0,TINKLA_FLOAT
     },
+    {"TinklaRadarOffset",
+      "Radar offset",
+      "Horizontal radar offset from vehicle centerline. Positive values are toward the left side of the vehicle.",
+      "../assets/offroad/icon_settings.png",
+      "Radar offset:",
+      "Enter distance in meters. Positive toward left.",
+      "m",
+      0.0,-1.0,1.0,0.01,TINKLA_FLOAT
+    },
+
+    {"TinklaTeslaRadarBehindNosecone",
+      "Radar behind nosecone",
+      "Enable when the Tesla radar is relocated behind the nosecone.",
+      "../assets/offroad/icon_settings.png",
+      "","","",
+      0.0,0.0,0.0,0.0,TINKLA_TOGGLE
+    },
+
+    {"TinklaUseTeslaRadarUpsideDown",
+      "Radar upside down",
+      "Enable when the Tesla radar is physically mounted upside down.",
+      "../assets/offroad/icon_settings.png",
+      "","","",
+      0.0,0.0,0.0,0.0,TINKLA_TOGGLE
+    },
+
+    {"TinklaHasIcIntegration",
+      "Instrument Cluster Integration",
+      "Send OpenPilot lane and lead information to the Tesla instrument cluster.",
+      "../assets/offroad/icon_settings.png",
+      "","","",
+      0.0,0.0,0.0,0.0,TINKLA_TOGGLE
+    },
+
     {"TinklaDevUnit",
       "Tinkla Development Unit",
       "For use by developers only.",
       "../assets/offroad/icon_settings.png",
       "","","",1.0,0.0,0.0,0.0, TINKLA_TOGGLE
-      },
+      }
   };
   Params params;
 
