@@ -1,3 +1,8 @@
+Version 0.9.6-beta79 (2026-08-29)
+========================
+* Hopefully fixed a bug where steering could
+  become permanently unavailable
+
 Version 0.9.6-beta78 (2026-08-07)
 ========================
 * Change OP delay to 0.3s
