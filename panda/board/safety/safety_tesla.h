@@ -1303,7 +1303,8 @@ static int tesla_fwd_hook(int bus_num, CANPacket_t *to_fwd ) {
       //changes from 1-AVAILABLE to 2-ACTIVE and AutoPilot becomes unavailable
       //The condition has to be:
       // IF controls_allowed AND EPAS_eacStatus = 2 THEN EPAS_eacStatus = 1
-      if ((addr == 0x370) && (controls_allowed) && (!(autopilot_enabled || eac_enabled || autopark_enabled))) {
+      if ((addr == 0x370) && (tesla_lateral_allowed) &&
+        (!(autopilot_enabled || eac_enabled || autopark_enabled))) {
         int epas_eacStatus = ((GET_BYTE(to_fwd, 6) & 0xE0) >> 5);
         //we only change from 2 to 1 leaving all other values alone
         if (epas_eacStatus == 2) {
