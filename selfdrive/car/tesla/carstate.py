@@ -242,20 +242,9 @@ class CarState(CarStateBase):
     ret.steeringRateDeg = -cp.vl["STW_ANGLHP_STAT"]["StW_AnglHP_Spd"] # This is from a different angle sensor, and at different rate
     self.hands_on_level = cp.vl["EPAS_sysStatus"]["EPAS_handsOnLevel"]
     
-    # React immediately to a real driver steering takeover.
-    # Tesla's handsOnLevel can lag behind a fast wheel grab.
-    driver_torque_override = abs(ret.steeringTorque) >= 1.5
-
-    self.HSOSteeringPressed = (
-        self.hands_on_level >= self.handsOnLimit
-        or driver_torque_override
-    )
-    ret.steeringPressed = (
-        self.hands_on_level >= 1
-        or driver_torque_override
-    )
+    self.HSOSteeringPressed = (self.hands_on_level >= self.handsOnLimit)
     #ret.steeringPressed = ((self.hands_on_level >= 1) and not self.enableHSO) or (self.HSOSteeringPressed and self.enableHSO)
-    #ret.steeringPressed = (self.hands_on_level >= 1)
+    ret.steeringPressed = (self.hands_on_level >= 1)
     ret.steerFaultPermanent = steer_status == "EAC_FAULT"
     ret.steerFaultTemporary = steer_status == "EAC_INHIBITED" #(self.steer_warning not in ("EAC_ERROR_IDLE", "EAC_ERROR_HANDS_ON","EAC_ERROR_TMP_FAULT"))
 
