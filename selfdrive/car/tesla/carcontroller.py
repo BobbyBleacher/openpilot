@@ -69,7 +69,7 @@ class CarController:
 
 
     self.cruiseDelayFrame = 0
-    self.prevCruiseEnabled = CS.cruiseEnabled
+    self.prevCruiseEnabled = False
 
     self.lP = messaging.sub_sock('longitudinalPlan') 
     self.rS = messaging.sub_sock('radarState') 
