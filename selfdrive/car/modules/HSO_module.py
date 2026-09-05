@@ -9,8 +9,12 @@ class HSOController:
         human_control = False
 
         if CS.enableHSO and enabled:
-            # Only actual driver steering input refreshes the override timer.
             if CS.HSOSteeringPressed:
+                self.frame_humanSteered = frame
+
+            # Once HSO has started, keep it active while the blinker remains on.
+            if CS.turnSignalStalkState > 0 and \
+            frame - self.frame_humanSteered < (CS.hsoNumbPeriod * 100):
                 self.frame_humanSteered = frame
 
             if frame - self.frame_humanSteered < (CS.hsoNumbPeriod * 100):
