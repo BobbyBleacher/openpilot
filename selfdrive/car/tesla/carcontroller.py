@@ -155,6 +155,7 @@ class CarController:
       # the normal Openpilot steering-override events.
       steer_enabled = (
         CC.latActive
+        and not CS.out.steerFaultTemporary
         and not CS.human_control
         and not CS.out.cruiseState.standstill
       )
