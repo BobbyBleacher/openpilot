@@ -1,7 +1,6 @@
 import copy
 import time
 from collections import deque
-from openpilot.common.swaglog import cloudlog
 from cereal import car
 from openpilot.selfdrive.car.tesla.values import DBC, GEAR_MAP, DOORS, BUTTONS, CAR, CruiseButtons, CruiseState, WHEEL_RADIUS
 from openpilot.selfdrive.car.interfaces import CarStateBase
@@ -235,69 +234,17 @@ class CarState(CarStateBase):
     
     self.steer_warning = self.can_define.dv["EPAS_sysStatus"]["EPAS_eacErrorCode"].get(int(cp.vl["EPAS_sysStatus"]["EPAS_eacErrorCode"]), None)
     steer_status = self.can_define.dv["EPAS_sysStatus"]["EPAS_eacStatus"].get(int(cp.vl["EPAS_sysStatus"]["EPAS_eacStatus"]), None)
-    
     ret.steeringAngleDeg = -cp.vl["EPAS_sysStatus"]["EPAS_internalSAS"]
     ret.steeringTorque = -cp.vl["EPAS_sysStatus"]["EPAS_torsionBarTorque"]
 
     ret.steeringRateDeg = -cp.vl["STW_ANGLHP_STAT"]["StW_AnglHP_Spd"] # This is from a different angle sensor, and at different rate
     self.hands_on_level = cp.vl["EPAS_sysStatus"]["EPAS_handsOnLevel"]
     
-    # Fast driver-takeover detection.
-    # handsOnLevel is still the normal HSO trigger.
-    # This catches a rapid, forceful wheel grab before Tesla's hands-on state catches up.
-
-    prev_driver_torque = getattr(self, "_prev_driver_torque", ret.steeringTorque)
-    torque_delta = abs(ret.steeringTorque - prev_driver_torque)
-
-    fast_driver_override = (
-        abs(ret.steeringTorque) >= 3.0
-        and torque_delta >= 0.75
-    )
-
-    self._prev_driver_torque = ret.steeringTorque
-
-    self.HSOSteeringPressed = (
-        self.hands_on_level >= self.handsOnLimit
-        or fast_driver_override
-    )
-
-    ret.steeringPressed = (
-        self.hands_on_level >= 1
-        or fast_driver_override
-    )
+    self.HSOSteeringPressed = (self.hands_on_level >= self.handsOnLimit)
+    #ret.steeringPressed = ((self.hands_on_level >= 1) and not self.enableHSO) or (self.HSOSteeringPressed and self.enableHSO)
+    ret.steeringPressed = (self.hands_on_level >= 1)
     ret.steerFaultPermanent = steer_status == "EAC_FAULT"
     ret.steerFaultTemporary = steer_status == "EAC_INHIBITED" #(self.steer_warning not in ("EAC_ERROR_IDLE", "EAC_ERROR_HANDS_ON","EAC_ERROR_TMP_FAULT"))
-
-    # Debug + persist EPAS state transitions
-    if steer_status != getattr(self, "_last_steer_status", None):
-      cloudlog.warning(
-        f"TESLA_STEER_STATE status={steer_status} "
-        f"human_control={getattr(self, 'human_control', False)} "
-        f"cruise={ret.cruiseState.enabled}"
-      )
-
-      try:
-        import time
-
-        with open("/data/epas_state_log.txt", "a") as f:
-          f.write(
-            f"{time.time():.3f} "
-            f"EPAS={steer_status} "
-            f"torque={ret.steeringTorque:.2f} "
-            f"angle={ret.steeringAngleDeg:.2f} "
-            f"steeringPressed={ret.steeringPressed} "
-            f"cruise={ret.cruiseState.enabled}\n"
-          )
-
-        if steer_status == "EAC_INHIBITED":
-          with open("/data/EPAS_FAULT_OCCURRED", "w") as f:
-            f.write(f"{time.time():.3f}\n")
-
-      except Exception:
-        pass
-
-      self._last_steer_status = steer_status
-
     self.torqueLevel = cp.vl["DI_torque1"]["DI_torqueMotor"]
 
     self.esp_long_acceleration = cp.vl["ESP_ACC"]["Long_Acceleration"]
