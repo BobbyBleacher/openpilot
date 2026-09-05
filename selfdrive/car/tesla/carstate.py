@@ -259,13 +259,34 @@ class CarState(CarStateBase):
     ret.steerFaultPermanent = steer_status == "EAC_FAULT"
     ret.steerFaultTemporary = steer_status == "EAC_INHIBITED" #(self.steer_warning not in ("EAC_ERROR_IDLE", "EAC_ERROR_HANDS_ON","EAC_ERROR_TMP_FAULT"))
 
-    # Debug EPAS state transitions
+    # Debug + persist EPAS state transitions
     if steer_status != getattr(self, "_last_steer_status", None):
       cloudlog.warning(
         f"TESLA_STEER_STATE status={steer_status} "
         f"human_control={getattr(self, 'human_control', False)} "
         f"cruise={ret.cruiseState.enabled}"
       )
+
+      try:
+        import time
+
+        with open("/data/epas_state_log.txt", "a") as f:
+          f.write(
+            f"{time.time():.3f} "
+            f"EPAS={steer_status} "
+            f"torque={ret.steeringTorque:.2f} "
+            f"angle={ret.steeringAngleDeg:.2f} "
+            f"steeringPressed={ret.steeringPressed} "
+            f"cruise={ret.cruiseState.enabled}\n"
+          )
+
+        if steer_status == "EAC_INHIBITED":
+          with open("/data/EPAS_FAULT_OCCURRED", "w") as f:
+            f.write(f"{time.time():.3f}\n")
+
+      except Exception:
+        pass
+
       self._last_steer_status = steer_status
 
     self.torqueLevel = cp.vl["DI_torque1"]["DI_torqueMotor"]
