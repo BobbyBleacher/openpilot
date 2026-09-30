@@ -221,7 +221,6 @@ void OnroadAlerts::paintEvent(QPaintEvent *event) {
   if (alert.size == cereal::ControlsState::AlertSize::SMALL) {
     p.setFont(InterFont(lane_change_alert ? 42 : 74, QFont::DemiBold));
     p.drawText(r, Qt::AlignCenter, alert.text1);
-  }
   } else if (alert.size == cereal::ControlsState::AlertSize::MID) {
     p.setFont(InterFont(88, QFont::Bold));
     p.drawText(QRect(0, c.y() - 125, width(), 150), Qt::AlignHCenter | Qt::AlignTop, alert.text1);
