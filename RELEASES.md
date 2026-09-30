@@ -1,3 +1,8 @@
+Version 0.9.6-beta80 (2026-09-30)
+========================
+* Finish lane changes sooner (less blinker time after)
+* Small lane change text boxes
+
 Version 0.9.6-beta79 (2026-08-29)
 ========================
 * Hopefully fixed a bug where steering could

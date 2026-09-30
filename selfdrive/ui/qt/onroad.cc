@@ -157,6 +157,12 @@ void OnroadAlerts::paintEvent(QPaintEvent *event) {
   if (alert.size == cereal::ControlsState::AlertSize::NONE) {
     return;
   }
+  const bool lane_change_alert =
+    alert.type.startsWith("preLaneChangeLeft/") ||
+    alert.type.startsWith("preLaneChangeRight/") ||
+    alert.type.startsWith("laneChangeBlocked/") ||
+    alert.type.startsWith("laneChange/");
+
   static std::map<cereal::ControlsState::AlertSize, const int> alert_heights = {
     {cereal::ControlsState::AlertSize::SMALL, 271},
     {cereal::ControlsState::AlertSize::MID, 420},
@@ -170,7 +176,26 @@ void OnroadAlerts::paintEvent(QPaintEvent *event) {
     margin = 0;
     radius = 0;
   }
-  QRect r = QRect(0 + margin, height() - h + margin, width() - margin*2, h - margin*2);
+  QRect r;
+
+    if (lane_change_alert) {
+      const int banner_width = 1000;
+      const int banner_height = 140;
+
+      r = QRect(
+        (width() - banner_width) / 2,
+        height() - banner_height - 40,
+        banner_width,
+        banner_height
+      );
+    } else {
+      r = QRect(
+        margin,
+        height() - h + margin,
+        width() - margin * 2,
+        h - margin * 2
+      );
+    }
 
   QPainter p(this);
 
@@ -194,8 +219,9 @@ void OnroadAlerts::paintEvent(QPaintEvent *event) {
   p.setPen(QColor(0xff, 0xff, 0xff));
   p.setRenderHint(QPainter::TextAntialiasing);
   if (alert.size == cereal::ControlsState::AlertSize::SMALL) {
-    p.setFont(InterFont(74, QFont::DemiBold));
+    p.setFont(InterFont(lane_change_alert ? 42 : 74, QFont::DemiBold));
     p.drawText(r, Qt::AlignCenter, alert.text1);
+  }
   } else if (alert.size == cereal::ControlsState::AlertSize::MID) {
     p.setFont(InterFont(88, QFont::Bold));
     p.drawText(QRect(0, c.y() - 125, width(), 150), Qt::AlignHCenter | Qt::AlignTop, alert.text1);
