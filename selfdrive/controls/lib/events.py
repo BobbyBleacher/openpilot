@@ -148,7 +148,7 @@ class NoEntryAlert(Alert):
                alert_text_1: str = "openpilot Unavailable",
                visual_alert: car.CarControl.HUDControl.VisualAlert=VisualAlert.none):
     super().__init__(alert_text_1, alert_text_2, AlertStatus.normal,
-                     AlertSize.mid, Priority.LOW, visual_alert,
+                     AlertSize.small, Priority.LOW, visual_alert,
                      AudibleAlert.refuse, 3.)
 
 
@@ -170,7 +170,7 @@ class UserSoftDisableAlert(SoftDisableAlert):
 class ImmediateDisableAlert(Alert):
   def __init__(self, alert_text_2: str):
     super().__init__("TAKE CONTROL IMMEDIATELY", alert_text_2,
-                     AlertStatus.critical, AlertSize.full,
+                     AlertStatus.critical, AlertSize.small,
                      Priority.HIGHEST, VisualAlert.steerRequired,
                      AudibleAlert.warningImmediate, 4.),
 
