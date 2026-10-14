@@ -330,10 +330,17 @@ class CarState(CarStateBase):
 
       # A fresh stalk pull always enables OpenPilot lateral,
       # regardless of whether Tesla ACC is available.
-      ap_armed = time.monotonic() < self.ap_arm_until
+      now = time.monotonic()
+      ap_armed = now < self.ap_arm_until
 
-      if main_pull and not self.autopilot_enabled and not ap_armed:
-        self.cruiseEnabled = True
+      if main_pull and not self.autopilot_enabled:
+        if ap_armed:
+          # A pull during the stock-AP window may be the first half
+          # of the double-pull. Keep OP lateral out of the way and
+          # restart the window from this pull.
+          self.ap_arm_until = now + 1.0
+        else:
+          self.cruiseEnabled = True
 
       # Explicitly hand control back to Tesla when stock Autosteer,
       # Enhanced Autopilot, or Autopark becomes active.
