@@ -922,7 +922,11 @@ static void tesla_rx_hook(CANPacket_t *to_push) {
         // AP1/AP2 car with stock AP enabled:
         // allow OP lateral directly from the stalk, independent of Tesla ACC.
         if (has_ap_hardware && !has_ap_disabled) {
-          if (ap_lever_position == 1) {
+          if (ap_lever_position == 2) {
+            // Pull stalk: allow OpenPilot steering even if ACC is unavailable.
+            tesla_lateral_allowed = true;
+          }
+          else if (ap_lever_position == 1) {
             // Cancel stalk: explicitly disable OpenPilot steering.
             tesla_lateral_allowed = false;
           }
