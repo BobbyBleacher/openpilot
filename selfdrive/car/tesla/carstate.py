@@ -328,30 +328,24 @@ class CarState(CarStateBase):
         and self.prev_cruise_buttons != CruiseButtons.MAIN
       )
 
-      # A fresh stalk pull always enables OpenPilot lateral,
-      # regardless of whether Tesla ACC is available.
-      now = time.monotonic()
-      ap_armed = now < self.ap_arm_until
+      # CANCEL primes the next stalk sequence for stock Tesla Autopilot.
+      ap_armed = time.monotonic() < self.ap_arm_until
 
-      if main_pull and not self.autopilot_enabled:
-        if ap_armed:
-          # A pull during the stock-AP window may be the first half
-          # of the double-pull. Keep OP lateral out of the way and
-          # restart the window from this pull.
-          self.ap_arm_until = now + 1.0
-        else:
-          self.cruiseEnabled = True
+      # No preceding CANCEL: MAIN immediately enables OpenPilot lateral.
+      if main_pull and not self.autopilot_enabled and not ap_armed:
+        self.cruiseEnabled = True
 
-      # Explicitly hand control back to Tesla when stock Autosteer,
-      # Enhanced Autopilot, or Autopark becomes active.
+      # Once stock Autopilot/Autopark takes control, keep OpenPilot lateral off.
       if self.autopilot_enabled or summon_or_autopark_enabled:
         self.cruiseEnabled = False
+        self.ap_arm_until = 0.0
 
-      # Stalk cancel always disables Openpilot lateral
-      # and opens a 1-second window for engaging stock Autopilot.
+      # CANCEL means:
+      #   1. Disable OpenPilot lateral.
+      #   2. Reserve the next pull/pull sequence for stock Autopilot.
       if self.cruise_buttons == CruiseButtons.CANCEL:
         self.cruiseEnabled = False
-        self.ap_arm_until = time.monotonic() + 1.0
+        self.ap_arm_until = time.monotonic() + 1.5
 
       ret.cruiseState.enabled = self.cruiseEnabled and self.cruiseDelay
       

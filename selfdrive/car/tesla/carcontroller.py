@@ -67,10 +67,6 @@ class CarController:
       pedalcan = 0
     self.long_controller = LONGController(CP,self.packer,self.tesla_can,pedalcan)
 
-
-    self.cruiseDelayFrame = 0
-    self.prevCruiseEnabled = False
-
     self.lP = messaging.sub_sock('longitudinalPlan') 
     self.rS = messaging.sub_sock('radarState') 
     self.mD = messaging.sub_sock('modelV2')
@@ -96,26 +92,13 @@ class CarController:
       tesla_cruise_active = CS.tesla_acc_enabled
 
       # Chill mode: Tesla handles longitudinal.
-      # Experimental mode: Openpilot handles longitudinal so model-based
-      # stopping for lights and stop signs remains available.
+      # Experimental mode: Openpilot handles longitudinal.
       CS.enableACC = tesla_cruise_active and not self.experimental_mode
 
-      ap_armed = time.monotonic() < CS.ap_arm_until
-
-      if CS.cruiseEnabled:
-        if ap_armed:
-          # Give stock AP time to detect the double-pull.
-          if not self.prevCruiseEnabled:
-            self.cruiseDelayFrame = self.frame
-
-          if self.frame - self.cruiseDelayFrame >= 100:
-            CS.cruiseDelay = True
-        else:
-          # Normal OP engagement: no delay.
-          CS.cruiseDelay = True
-      else:
-        self.cruiseDelayFrame = 0
-        CS.cruiseDelay = False
+      # No normal OpenPilot engagement delay.
+      # CANCEL in carstate.py determines whether the stalk is reserved
+      # for a stock Autopilot double-pull.
+      CS.cruiseDelay = CS.cruiseEnabled
 
     #receive socks
     long_plan = messaging.recv_one_or_none(self.lP)
